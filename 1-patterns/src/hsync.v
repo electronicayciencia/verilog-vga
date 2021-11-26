@@ -1,9 +1,10 @@
 module hsync (
     input  i_clk,
-    output o_hsync,
-    output o_hde,
-    output [8:0] o_x
+    output reg o_hsync,
+    output reg o_hde,
+    output reg [8:0] o_x
 );
+
 
 localparam hactive      = 480;
 localparam hback_porch  = 2;
@@ -22,11 +23,9 @@ always @(posedge i_clk) begin
     else
         counter <= counter + 1'b1;
 
-    //o_hsync <= ~(counter >= syncstart & counter < syncend);
+    o_hsync <= ~(counter >= syncstart & counter < syncend);
+    o_x     <= counter[8:0];
+    o_hde   <= (counter < hactive);
 end
-
-assign o_x     = counter[8:0];
-assign o_hde   = (counter < hactive);
-assign o_hsync = ~(counter >= syncstart & counter < syncend);
 
 endmodule

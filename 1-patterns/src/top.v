@@ -18,6 +18,8 @@ Gowin_rPLL pll(
 
 wire [8:0] x;
 wire [8:0] y;
+wire hde;
+wire vde;
 
 hsync hsync(
     .i_clk     (LCD_CLK),    // counter clock
@@ -35,8 +37,14 @@ vsync vsync(
 
 assign LCD_DEN = hde & vde;
 
-assign LCD_R = 5'b00000;
-assign LCD_G = 6'b000000;
-assign LCD_B = 5'b10000;
+patterns pattern(
+    .i_x       (x),
+    .i_y       (y),
+    .i_clk     (LCD_VSYNC),
+    .o_R       (LCD_R),
+    .o_G       (LCD_G),
+    .o_B       (LCD_B)
+);
+
 
 endmodule

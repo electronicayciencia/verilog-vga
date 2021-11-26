@@ -7,6 +7,11 @@
     <FileList>
         <File path="src/gowin_rpll/gowin_rpll.v" type="file.verilog" enable="1"/>
         <File path="src/hsync.v" type="file.verilog" enable="1"/>
+        <File path="src/patterns.v" type="file.verilog" enable="1"/>
+        <File path="src/patterns/pat_gradient.v" type="file.verilog" enable="1"/>
+        <File path="src/patterns/pat_checkboard.v" type="file.verilog" enable="1"/>
+        <File path="src/patterns/pat_edge.v" type="file.verilog" enable="1"/>
+        <File path="src/patterns/pat_fixed.v" type="file.verilog" enable="1"/>
         <File path="src/top.v" type="file.verilog" enable="1"/>
         <File path="src/vsync.v" type="file.verilog" enable="1"/>
         <File path="src/lcd.cst" type="file.cst" enable="1"/>

@@ -6,18 +6,18 @@
 
 -mod_name Gowin_rPLL
 -file_name gowin_rpll
--path D:/Documentos/GitHub/verilog-vga/1-patterns/patterns/src/gowin_rpll/
+-path D:/Documentos/GitHub/verilog-vga/1-patterns/src/gowin_rpll/
 -type PLL
 -rPll true
 -file_type vlg
 -dev_type GW1N-1
 -dyn_idiv_sel false
--idiv_sel 6
+-idiv_sel 4
 -dyn_fbdiv_sel false
--fbdiv_sel 25
+-fbdiv_sel 15
 -dyn_odiv_sel false
 -odiv_sel 8
--dyn_sdiv_sel 100
+-dyn_sdiv_sel 10
 -dyn_da_en true
 -rst_sig false
 -rst_sig_p false
