@@ -6,7 +6,7 @@
 
 -mod_name rom_4c
 -file_name rom_4c
--path D:/Documentos/GitHub/verilog-vga/2-image/src/rom_4c/
+-path D:/Documentos/GitHub/verilog-vga/2-image/src/4c/rom_4c/
 -type RAM_ROM
 -file_type vlg
 -pROM true
@@ -14,4 +14,4 @@
 -width 2
 -read_mode bypass
 -reset_mode sync
--init_file D:\Documentos\GitHub\verilog-vga\2-image\test_240x128x2.mi
+-init_file D:\Documentos\GitHub\verilog-vga\2-image\src\4c\test_240x128x2.mi

@@ -9,7 +9,7 @@ version=1.0
 [Config]
 DEPTH=32767
 LANG=0
-MEM_FILE=../../test_240x128x2.mi
+MEM_FILE=../test_240x128x2.mi
 READ=0
 RESET_MODE=true
 WIDTH=2

@@ -1,5 +1,6 @@
 module top (
     input XTAL_IN,       // 24 MHz
+    input BTN_A,         // color palette
     output [4:0] LCD_R,
     output [5:0] LCD_G,
     output [4:0] LCD_B,
@@ -81,7 +82,7 @@ wire [14:0] rom_addr;
 assign rom_addr = {y[7:1], x[8:1]};
 
 // Black lines when y > 256
-assign blackout = y[8];
+wire blackout = y[8];
 
 rom_4c ROM(
     .dout      (rom_out),    //output [1:0] dout
@@ -93,13 +94,20 @@ rom_4c ROM(
 );
 
 
-palette_4c palette (
+wire [4:0] R;
+wire [5:0] G;
+wire [4:0] B;
+
+palette palette (
     .i_color   (rom_out),    // color index
-    .i_on      (~blackout),  // pixel is on
-    .o_red     (LCD_R),
-    .o_green   (LCD_G),
-    .o_blue    (LCD_B)
+    .i_palette (~BTN_A),      // palette number
+    .o_red     (R),
+    .o_green   (G),
+    .o_blue    (B)
 );
 
+assign LCD_R = R & {5{~blackout}};
+assign LCD_G = G & {6{~blackout}};
+assign LCD_B = B & {5{~blackout}};
 
 endmodule

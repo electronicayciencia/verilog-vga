@@ -12,7 +12,7 @@
         <File path="src/common/gowin_rpll/gowin_rpll.v" type="file.verilog" enable="1"/>
         <File path="src/common/hsync.v" type="file.verilog" enable="1"/>
         <File path="src/common/vsync.v" type="file.verilog" enable="1"/>
-        <File path="src/common/lcd.cst" type="file.cst" enable="1"/>
+        <File path="src/4c/lcd.cst" type="file.cst" enable="1"/>
         <File path="src/4c/test_240x128x2.mi" type="file.other" enable="1"/>
     </FileList>
 </Project>
