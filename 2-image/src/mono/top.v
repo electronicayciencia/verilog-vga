@@ -68,7 +68,6 @@ assign LCD_VSYNC = vsync_delayed;
 assign LCD_DEN   = enable_delayed;
 
 
-
 // Read from Memory
 
 wire false = 1'b0;

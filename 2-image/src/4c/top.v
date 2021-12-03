@@ -100,7 +100,7 @@ wire [4:0] B;
 
 palette palette (
     .i_color   (rom_out),    // color index
-    .i_palette (~BTN_A),      // palette number
+    .i_palette (~BTN_A),     // palette number
     .o_red     (R),
     .o_green   (G),
     .o_blue    (B)
