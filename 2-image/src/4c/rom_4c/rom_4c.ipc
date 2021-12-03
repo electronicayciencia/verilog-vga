@@ -1,15 +1,15 @@
 [General]
 ipc_version=4
-file=gowin_prom
-module=Gowin_pROM
+file=rom_4c
+module=rom_4c
 target_device=gw1n1-004
 type=ram_prom
 version=1.0
 
 [Config]
-DEPTH=65535
+DEPTH=32767
 LANG=0
+MEM_FILE=../../test_240x128x2.mi
 READ=0
 RESET_MODE=true
-WIDTH=1
-MEM_FILE=../../test_240x256x1.mi
+WIDTH=2

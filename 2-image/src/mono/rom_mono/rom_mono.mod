@@ -4,9 +4,9 @@
 -part_number GW1N-LV1QN48C6/I5
 
 
--mod_name Gowin_pROM
--file_name gowin_prom
--path D:/Documentos/GitHub/verilog-vga/2-image/src/gowin_prom/
+-mod_name rom_mono
+-file_name rom_mono
+-path D:/Documentos/GitHub/verilog-vga/2-image/src/rom_mono/
 -type RAM_ROM
 -file_type vlg
 -pROM true

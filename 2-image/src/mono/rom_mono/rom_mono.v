@@ -4,9 +4,9 @@
 //GOWIN Version: V1.9.8
 //Part Number: GW1N-LV1QN48C6/I5
 //Device: GW1N-1
-//Created Time: Fri Dec 03 11:26:40 2021
+//Created Time: Fri Dec 03 14:30:21 2021
 
-module Gowin_pROM (dout, clk, oce, ce, reset, ad);
+module rom_mono (dout, clk, oce, ce, reset, ad);
 
 output [0:0] dout;
 input clk;
@@ -398,4 +398,4 @@ MUX2 mux_inst_2 (
   .I1(mux_o_1),
   .S0(dff_q_0)
 );
-endmodule //Gowin_pROM
+endmodule //rom_mono

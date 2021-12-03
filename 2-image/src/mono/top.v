@@ -83,7 +83,7 @@ assign rom_addr = {y[7:0], x[8:1]};
 // Black lines when y > 256
 assign blackout = y[8];
 
-Gowin_pROM ROM(
+rom_mono ROM(
     .dout      (rom_out),    //output [0:0] dout
     .clk       (LCD_CLK),    //input clk
     .oce       (true),       //input oce
@@ -91,7 +91,6 @@ Gowin_pROM ROM(
     .reset     (false),      //input reset
     .ad        (rom_addr)    //input [15:0] address
 );
-
 
 assign LCD_R = {5{rom_out & ~blackout}};
 assign LCD_G = {6{rom_out & ~blackout}};
