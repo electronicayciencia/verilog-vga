@@ -1,0 +1,17 @@
+[General]
+ipc_version=4
+file=video_ram
+module=video_ram
+target_device=gw1n1-004
+type=ram_sdpb
+version=1.0
+
+[Config]
+BYTE_SIZE=0
+DEPTH_A=65536
+DEPTH_B=65536
+LANG=0
+READ=0
+RESET_MODE=true
+WIDTH_A=1
+WIDTH_B=1
