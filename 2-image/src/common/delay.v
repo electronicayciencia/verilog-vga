@@ -5,7 +5,6 @@ module delay (
     output reg out
 );
 
-
 always @(posedge clk) 
     out <= in;
 
