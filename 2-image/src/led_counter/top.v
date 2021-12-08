@@ -1,6 +1,5 @@
 module top (
     input XTAL_IN,       // 24 MHz
-    input BTN_A,         // color palette
     output [4:0] LCD_R,
     output [5:0] LCD_G,
     output [4:0] LCD_B,
@@ -68,56 +67,22 @@ assign LCD_HSYNC = hsync_delayed;
 assign LCD_VSYNC = vsync_delayed;
 assign LCD_DEN   = enable_delayed;
 
+reg [12:0] counter = 0;
+
+always@(posedge LCD_VSYNC)
+    counter <= counter + 1'b1;
 
 
-// Read from Memory
-
-wire false = 1'b0;
-wire true = 1'b1;
-
-
-wire [14:0] rom_addr;
-wire [15:0] rom_on_out;
-wire [15:0] rom_off_out;
-
-
-
-// Black lines when y > 256
-wire blackout = y[8];
-
-rom_led_on rom_led_on(
-    .ad       (rom_addr),    //input [14:0] address
-    .clk      (LCD_CLK),     //input clk
-    .dout     (rom_on_out),  //output [1:0] dout
-    .oce      (true),        //input oce
-    .ce       (true),        //input ce
-    .reset    (false)        //input reset
-);
-
-rom_led_off rom_led_off(
-    .ad       (rom_addr),    //input [14:0] address
-    .clk      (LCD_CLK),     //input clk
-    .dout     (rom_off_out), //output [1:0] dout
-    .oce      (true),        //input oce
-    .ce       (true),        //input ce
-    .reset    (false)        //input reset
+sprites sprites (
+    .i_x    (x),        // horizontal coordinate
+    .i_y    (y),        // vertical coordinate
+    .status (counter),  // led status
+    .i_clk  (LCD_CLK),  // clock
+    .o_r    (LCD_R),    // red component
+    .o_g    (LCD_G),    // green component
+    .o_b    (LCD_B)     // blue component
 );
 
 
-wire [4:0] R;
-wire [5:0] G;
-wire [4:0] B;
-
-palette palette (
-    .i_color   (rom_out),    // color index
-    .i_palette (~BTN_A),     // palette number
-    .o_red     (R),
-    .o_green   (G),
-    .o_blue    (B)
-);
-
-assign LCD_R = R & {5{~blackout}};
-assign LCD_G = G & {6{~blackout}};
-assign LCD_B = B & {5{~blackout}};
 
 endmodule

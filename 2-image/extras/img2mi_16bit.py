@@ -35,7 +35,7 @@ def depth(im):
     return 2**(addrh+addrv)
     
 def convert_16bit(im):
-    """ Read image. FIX: Assume 16bit address for cols and lines. """
+    """ Read image. """
 
     print(miheader(depth(im), 16))  # data width = 16
     
@@ -49,7 +49,7 @@ def convert_16bit(im):
             rgb565 = r5
             rgb565 = (rgb565 << 6) + g6
             rgb565 = (rgb565 << 5) + b5
-            print("%04x" % (rgb565)) # 4, magic number: fix
+            print("%04x" % (rgb565))
     
 
 def main():

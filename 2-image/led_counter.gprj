@@ -11,6 +11,7 @@
         <File path="src/common/vsync.v" type="file.verilog" enable="1"/>
         <File path="src/led_counter/rom_led_off/rom_led_off.v" type="file.verilog" enable="1"/>
         <File path="src/led_counter/rom_led_on/rom_led_on.v" type="file.verilog" enable="1"/>
+        <File path="src/led_counter/sprites.v" type="file.verilog" enable="1"/>
         <File path="src/led_counter/top.v" type="file.verilog" enable="1"/>
         <File path="src/led_counter/lcd.cst" type="file.cst" enable="1"/>
         <File path="src/led_counter/led_off_32x32x16.mi" type="file.other" enable="1"/>
