@@ -1,0 +1,15 @@
+[General]
+ipc_version=4
+file=texture0_rom
+module=texture0_rom
+target_device=gw1n1-004
+type=ram_prom
+version=1.0
+
+[Config]
+DEPTH=1024
+LANG=0
+MEM_FILE=../texture_0_32x32x16.mi
+READ=0
+RESET_MODE=true
+WIDTH=16

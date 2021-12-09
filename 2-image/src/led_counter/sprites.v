@@ -1,4 +1,4 @@
-// Select the proper 32x32 16bit sprite between 4 available
+// Select the proper 32x32 16bit texture between 4 available
 module sprites (
     input [8:0] i_x,     // horizontal coordinate
     input [8:0] i_y,     // vertical coordinate
@@ -10,16 +10,25 @@ module sprites (
 );
 
 
-// Read from Memory
 
 wire false = 1'b0;
 wire true = 1'b1;
 
+// work with 32x32 blocks (cells)
+// bits 0-4 set the inner cell position, bit 5-8 set the cell number
+wire [3:0] x = i_x[8:5];
+wire [3:0] y = i_y[8:5];
 wire [9:0] rom_addr = {i_y[4:0], i_x[4:0]}; // 32x32=1024
+
+
 wire [15:0] rom_on_out;
 wire [15:0] rom_off_out;
+wire [15:0] rom_texture0_out;
+wire [15:0] rom_texture1_out;
 
-wire [15:0] rgb; // composite RGB565 color from ROM
+
+reg [15:0] rgb_temp; // temporary RGB565 color from ROM (with black holes)
+wire [15:0] rgb;     // RGB565 color from ROM (with black replaced by default texture)
 assign o_r = rgb[15:11];
 assign o_g = rgb[10:5];
 assign o_b = rgb[4:0];
@@ -43,11 +52,37 @@ rom_led_off rom_led_off(
     .reset    (false)
 );
 
+texture0_rom texture0_rom(
+    .ad       (rom_addr),    //input [9:0] address
+    .clk      (i_clk),
+    .dout     (rom_texture0_out),
+    .oce      (true),
+    .ce       (true),
+    .reset    (false)
+);
 
-assign rgb = i_x < 32   ? 0 :
-             i_x > 448  ? 0 :
-             i_y < 96   ? 0 :
-             i_y > 128  ? 0 :
-             status[5] ? rom_on_out : rom_off_out;
+texture1_rom texture1_rom(
+    .ad       (rom_addr),    //input [9:0] address
+    .clk      (i_clk),
+    .dout     (rom_texture1_out),
+    .oce      (true),
+    .ce       (true),
+    .reset    (false)
+);
+
+
+// This logic can be improved (460 LUTs)
+always @(*) begin
+    if (y == 3 & x >= 1 & x <= 13)
+        rgb_temp <= status[13-x] ? rom_on_out : rom_off_out;
+    else if ( y < 2 | y > 4)
+        rgb_temp <= rom_texture1_out;      
+    else
+        rgb_temp <= rom_texture0_out;
+end
+
+// Fill black with default texture
+assign rgb = |rgb_temp ? rgb_temp : rom_texture0_out;
+
 
 endmodule
