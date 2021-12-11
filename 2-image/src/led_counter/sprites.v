@@ -9,8 +9,6 @@ module sprites (
     output [4:0] o_b     // blue component
 );
 
-
-
 wire false = 1'b0;
 wire true = 1'b1;
 
@@ -71,17 +69,22 @@ texture1_rom texture1_rom(
 );
 
 
-// This logic can be improved (460 LUTs)
+
 always @(*) begin
+    // leds are in line 3
     if (y == 3 & x >= 1 & x <= 13)
         rgb_temp <= status[13-x] ? rom_on_out : rom_off_out;
+
+    // alternate texture
     else if ( y < 2 | y > 4)
-        rgb_temp <= rom_texture1_out;      
+        rgb_temp <= rom_texture1_out;
+
+    // default texture
     else
         rgb_temp <= rom_texture0_out;
 end
 
-// Fill black with default texture
+// Replace black with default texture
 assign rgb = |rgb_temp ? rgb_temp : rom_texture0_out;
 
 
