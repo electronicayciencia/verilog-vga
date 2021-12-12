@@ -1,6 +1,5 @@
-# Images
+# Part II: Images
 
-Display an image from the FPGA memory.
+Draw images from ROM or RAM.
 
-Read more about this in (spanish): TBD
-
+See main [README](README) file.
