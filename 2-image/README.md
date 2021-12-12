@@ -2,4 +2,4 @@
 
 Draw images from ROM or RAM.
 
-See main [README](README) file.
+See main [README](../README.md) file.
