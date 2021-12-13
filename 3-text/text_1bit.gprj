@@ -1,0 +1,18 @@
+<?xml version="1" encoding="UTF-8"?>
+<!DOCTYPE gowin-fpga-project>
+<Project>
+    <Template>FPGA</Template>
+    <Version>5</Version>
+    <Device name="GW1N-1" pn="GW1N-LV1QN48C6/I5">gw1n1-004</Device>
+    <FileList>
+        <File path="src/common/delay.v" type="file.verilog" enable="1"/>
+        <File path="src/common/gowin_rpll/gowin_rpll.v" type="file.verilog" enable="1"/>
+        <File path="src/common/hsync.v" type="file.verilog" enable="1"/>
+        <File path="src/common/vsync.v" type="file.verilog" enable="1"/>
+        <File path="src/text_1bit/font_rom/font_rom.v" type="file.verilog" enable="1"/>
+        <File path="src/text_1bit/text.v" type="file.verilog" enable="1"/>
+        <File path="src/text_1bit/top.v" type="file.verilog" enable="1"/>
+        <File path="src/common/lcd.cst" type="file.cst" enable="1"/>
+        <File path="src/text_1bit/cp437_1bit.mi" type="file.other" enable="1"/>
+    </FileList>
+</Project>
