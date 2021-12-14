@@ -9,6 +9,7 @@
         <File path="src/common/gowin_rpll/gowin_rpll.v" type="file.verilog" enable="1"/>
         <File path="src/common/hsync.v" type="file.verilog" enable="1"/>
         <File path="src/common/vsync.v" type="file.verilog" enable="1"/>
+        <File path="src/text_1bit/charbuf_mono_64x64/charbuf_mono_64x64.v" type="file.verilog" enable="1"/>
         <File path="src/text_1bit/font_rom/font_rom.v" type="file.verilog" enable="1"/>
         <File path="src/text_1bit/text.v" type="file.verilog" enable="1"/>
         <File path="src/text_1bit/top.v" type="file.verilog" enable="1"/>

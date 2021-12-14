@@ -76,10 +76,11 @@ wire on;
 
 // Character generator, monochrome, 8x8 font
 text text(
-    .i_x(x),                 // horizontal coordinate
-    .i_y(y),                 // vertical coordinate
+    .i_x(x[2:0]),            // horizontal coordinate
+    .i_y(y[2:0]),            // vertical coordinate
+    .i_chr(8'h61),           // character number
     .i_clk(LCD_CLK),         // clock
-    .o_on(on)                // pixel is on
+    .o_out(on)               // pixel is on or off
 );
 
 assign LCD_R = {5{on}};
