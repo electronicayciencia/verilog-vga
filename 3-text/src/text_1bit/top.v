@@ -9,6 +9,8 @@ module top (
     output LCD_DEN
 );
 
+wire false = 1'b0;
+wire true = 1'b1;
 
 Gowin_rPLL pll(
     .clkin     (XTAL_IN),      // input clkin 24MHz
@@ -45,19 +47,19 @@ wire hsync_delayed;
 wire vsync_delayed;
 wire enable_delayed;
 
-delay delay_h(
+delaybit_2tic delay_h(
     .clk  (LCD_CLK),
     .in   (hsync_timed),
     .out  (hsync_delayed)
 );
 
-delay delay_v(
+delaybit_2tic delay_v(
     .clk  (LCD_CLK),
     .in   (vsync_timed),
     .out  (vsync_delayed)
 );
 
-delay delay_en(
+delaybit_2tic delay_en(
     .clk  (LCD_CLK),
     .in   (enable_timed),
     .out  (enable_delayed)
@@ -68,20 +70,60 @@ assign LCD_VSYNC = vsync_delayed;
 assign LCD_DEN   = enable_delayed;
 
 
-// Read from Memory
+/*************************************
+/*  Part III: Text
+/*************************************/
 
-wire false = 1'b0;
-wire true = 1'b1;
-wire on;
+
+
+// Character buffer
+wire [11:0] buff_addr = {y[8:3], x[8:3]};
+wire [7:0] character;
+charbuf_mono_64x64 charbuf_mono_64x64(
+    //A port: write
+    .ada       (12'b0),      //input [11:0] A address
+    .din       (8'b0),       //input [7:0]  Data in
+    .clka      (LCD_CLK),    //input clock for A port
+    .cea       (false),      //input clock enable for A
+    .reseta    (false),      //input reset for A
+
+    //B port: read
+    .adb       (buff_addr),  //input [11:0] B address
+    .dout      (character),  //output [7:0] Data out
+    .clkb      (LCD_CLK),    //input clock for B port
+    .ceb       (true),       //input clock enable for B
+    .resetb    (false),      //input reset for B
+
+    //Global
+    .oce       (true)        //input Output Clock Enable (not used in bypass mode)
+);
+
+// Delay inner cell coordinates to wait for character buffer.
+wire [2:0] x_cell_delayed;
+wire [2:0] y_cell_delayed;
+
+delayvector3_1tic delay_xcell(
+    .clk  (LCD_CLK),
+    .in   (x[2:0]),
+    .out  (x_cell_delayed)
+);
+
+delayvector3_1tic delay_ycell(
+    .clk  (LCD_CLK),
+    .in   (y[2:0]),
+    .out  (y_cell_delayed)
+);
 
 // Character generator, monochrome, 8x8 font
+wire on;
 text text(
-    .i_x(x[2:0]),            // horizontal coordinate
-    .i_y(y[2:0]),            // vertical coordinate
-    .i_chr(8'h61),           // character number
+    .i_x(x_cell_delayed),    // horizontal coordinate
+    .i_y(y_cell_delayed),    // vertical coordinate
+    .i_chr(character),       // character number
     .i_clk(LCD_CLK),         // clock
     .o_out(on)               // pixel is on or off
 );
+
 
 assign LCD_R = {5{on}};
 assign LCD_G = {6{on}};
