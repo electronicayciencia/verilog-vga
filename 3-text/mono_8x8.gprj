@@ -10,11 +10,11 @@
         <File path="src/common/gowin_rpll/gowin_rpll.v" type="file.verilog" enable="1"/>
         <File path="src/common/hsync.v" type="file.verilog" enable="1"/>
         <File path="src/common/vsync.v" type="file.verilog" enable="1"/>
-        <File path="src/text_1bit/charbuf_mono_64x64/charbuf_mono_64x64.v" type="file.verilog" enable="1"/>
-        <File path="src/text_1bit/font_rom/font_rom.v" type="file.verilog" enable="1"/>
-        <File path="src/text_1bit/text.v" type="file.verilog" enable="1"/>
-        <File path="src/text_1bit/top.v" type="file.verilog" enable="1"/>
+        <File path="src/mono_8x8/charbuf_mono_64x64/charbuf_mono_64x64.v" type="file.verilog" enable="1"/>
+        <File path="src/mono_8x8/rom_font_1bit/rom_font_1bit.v" type="file.verilog" enable="1"/>
+        <File path="src/mono_8x8/text_1bit.v" type="file.verilog" enable="1"/>
+        <File path="src/mono_8x8/top.v" type="file.verilog" enable="1"/>
         <File path="src/common/lcd.cst" type="file.cst" enable="1"/>
-        <File path="src/text_1bit/cp437_1bit.mi" type="file.other" enable="1"/>
+        <File path="src/mono_8x8/cp437_1bit.mi" type="file.other" enable="1"/>
     </FileList>
 </Project>

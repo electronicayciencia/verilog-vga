@@ -4,9 +4,9 @@
 //GOWIN Version: V1.9.8
 //Part Number: GW1N-LV1QN48C6/I5
 //Device: GW1N-1
-//Created Time: Mon Dec 13 22:31:07 2021
+//Created Time: Fri Dec 17 11:53:06 2021
 
-module font_rom (dout, clk, oce, ce, reset, ad);
+module rom_font_1bit (dout, clk, oce, ce, reset, ad);
 
 output [0:0] dout;
 input clk;
@@ -94,4 +94,4 @@ defparam prom_inst_0.INIT_RAM_3D = 256'h00003B6E003B6E00000018007E0018000E1B1B18
 defparam prom_inst_0.INIT_RAM_3E = 256'h383C3637303030F000000000180000000000001818000000000000001C36361C;
 defparam prom_inst_0.INIT_RAM_3F = 256'h000000000000000000003C3C3C3C00000000003E0C18301E0000006C6C6C6C36;
 
-endmodule //font_rom
+endmodule //rom_font_1bit

@@ -1,45 +1,72 @@
 #!/usr/bin/env python
-# Create a Memory Initialization File for Character Buffer 64x64 mono.
+# Create a Memory Initialization File for Character Buffer mono from a text file.
 
+import sys
 from math import log2, ceil, pow
 
-# Screen dimensions
-h_pixels = 480
-v_pixels = 272
+def readtext(filename):
+    """Load the text file into an array of lines."""
+    with open(filename) as f:
+        mylist = f.read().splitlines()
 
-# Text cell size
-text_size_px = 8
+    return mylist
 
-# What to print in invisible zones
-filling_char = '0'
 
-available_chars = 256
+def print_mi_header(file_format, address_depth, data_width):
+    """Print MI file header via STDOUT."""
 
-# Calculate visible frame
-visible_cols  = h_pixels / text_size_px
-visible_lines = v_pixels / text_size_px
+    print("#File_format={}".format(file_format))
+    print("#Address_depth={}".format(address_depth))
+    print("#Data_width={}".format(data_width))
 
-# Calculate next power of two
-buffer_cols  = ceil(pow(2, ceil(log2(visible_cols))))
-buffer_lines = ceil(pow(2, ceil(log2(visible_lines))))
 
-address_depth = buffer_cols * buffer_lines
-data_width = ceil(log2(available_chars))
+def fill(h_pixels, v_pixels, text_size_px, filename, filling_char):
+    # Assume full 256 ascii
+    available_chars = 256
 
-print("#File_format=Hex")
-print("#Address_depth={}".format(address_depth))
-print("#Data_width={}".format(data_width))
+    # Calculate visible frame
+    visible_cols  = h_pixels / text_size_px
+    visible_lines = v_pixels / text_size_px
 
-counter = 0
+    # Calculate next power of two of that
+    buffer_cols  = ceil(pow(2, ceil(log2(visible_cols))))
+    buffer_lines = ceil(pow(2, ceil(log2(visible_lines))))
 
-for line in range(0, buffer_lines):
-    for col in range(0, buffer_cols):
-        if line < visible_lines and col < visible_cols:
-            print("{:02x}".format(counter))
-            counter = counter + 1
-            
-            if counter >= available_chars:
-                counter = 0
-                
-        else:
-            print("{:02x}".format(ord(filling_char)))
+    address_depth = buffer_cols * buffer_lines
+    data_width = ceil(log2(available_chars))
+
+    text = readtext(filename)
+
+    print_mi_header("Hex", address_depth, data_width)
+
+    for line in range(0, buffer_lines):
+        for col in range(0, buffer_cols):
+            if len(text) > line and len(text[line]) > col:
+                n = ord(text[line][col])
+                if n >= 256:
+                    raise(ValueError(
+                        "Non valid character detected in line {} col {}: {} > {}".format(line+1, col+1, n, available_chars)))
+                print("{:02x}".format(n))
+
+            else:
+                print("{:02x}".format(ord(filling_char)))
+
+
+def main():
+    if len(sys.argv) < 2:
+        print("Usage: {} filename.txt".format(sys.argv[0]))
+        exit(1)
+    else:
+        filename = sys.argv[1]
+
+    # Screen dimensions
+    h_pixels = 480
+    v_pixels = 272
+
+    text_size_px = 8   # Text cell size
+    filling_char = ' ' # What to print in invisible zones
+
+    fill(h_pixels, v_pixels, text_size_px, filename, filling_char)
+
+
+main()

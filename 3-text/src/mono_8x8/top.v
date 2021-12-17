@@ -99,24 +99,26 @@ charbuf_mono_64x64 charbuf_mono_64x64(
 );
 
 // Delay inner cell coordinates to wait for character buffer.
+wire [2:0] x_cell_timed = x[2:0];
+wire [2:0] y_cell_timed = y[2:0];
 wire [2:0] x_cell_delayed;
 wire [2:0] y_cell_delayed;
 
 delayvector3_1tic delay_xcell(
     .clk  (LCD_CLK),
-    .in   (x[2:0]),
+    .in   (x_cell_timed),
     .out  (x_cell_delayed)
 );
 
 delayvector3_1tic delay_ycell(
     .clk  (LCD_CLK),
-    .in   (y[2:0]),
+    .in   (y_cell_timed),
     .out  (y_cell_delayed)
 );
 
 // Character generator, monochrome, 8x8 font
 wire on;
-text text(
+text_1bit text(
     .i_x(x_cell_delayed),    // horizontal coordinate
     .i_y(y_cell_delayed),    // vertical coordinate
     .i_chr(character),       // character number

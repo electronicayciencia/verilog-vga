@@ -1,7 +1,7 @@
 [General]
 ipc_version=4
-file=font_rom
-module=font_rom
+file=rom_font_1bit
+module=rom_font_1bit
 target_device=gw1n1-004
 type=ram_prom
 version=1.0
