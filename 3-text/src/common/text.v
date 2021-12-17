@@ -1,4 +1,4 @@
-// Character generator, monochrome, 8x8 font
+// Character generator 8x8 font
 // Version for 8 bit ROM
 module text_1bit (
     input [2:0] i_x,     // horizontal coordinate
@@ -23,7 +23,7 @@ rom_font rom_font(
     .reset    (false)
 );
 
-// Horizontal coordinate selects with pixel to output
+// Horizontal coordinate selects which pixel to output
 // Cannot use a shift register because it won't work with doubled text (16x16 cells)
 wire [2:0] reverse = -i_x;
 assign o_out = chr_row[reverse +: 1];
