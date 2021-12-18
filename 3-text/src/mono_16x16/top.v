@@ -75,6 +75,19 @@ assign LCD_DEN   = enable_delayed;
 /*  Part III: Text
 /*************************************/
 
+// Demo module
+reg [12:0] counter = 0;
+wire [9:0] aram_addr;
+wire [7:0] aram_data;
+demo demo (
+    .i_status   (counter),
+    .i_clk      (LCD_CLK),
+    .o_address  (aram_addr),
+    .o_data     (aram_data)
+);
+
+always @(posedge vsync_timed)
+    counter <= counter + 1'b1;
 
 
 // Character buffer. Make the text bigger duplicating pixels
@@ -82,10 +95,10 @@ wire [9:0] buff_addr = {y[8:4], x[8:4]};
 wire [7:0] character;
 charbuf_mono_32x32 charbuf_mono_32x32(
     //A port: write
-    .ada       (10'b0),      //input [9:0] A address
-    .din       (8'b0),       //input [7:0]  Data in
+    .ada       (aram_addr),  //input [9:0] A address
+    .din       (aram_data),  //input [7:0]  Data in
     .clka      (LCD_CLK),    //input clock for A port
-    .cea       (false),      //input clock enable for A
+    .cea       (true),       //input clock enable for A
     .reseta    (false),      //input reset for A
 
     //B port: read
