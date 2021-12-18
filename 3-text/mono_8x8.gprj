@@ -9,14 +9,10 @@
         <File path="src/common/delayvector3_1tic.v" type="file.verilog" enable="1"/>
         <File path="src/common/gowin_rpll/gowin_rpll.v" type="file.verilog" enable="1"/>
         <File path="src/common/hsync.v" type="file.verilog" enable="1"/>
-        <File path="src/common/rom_font/rom_font.v" type="file.verilog" enable="1"/>
-        <File path="src/common/text.v" type="file.verilog" enable="1"/>
+        <File path="src/common/rom_font_1bit/rom_font_1bit.v" type="file.verilog" enable="1"/>
         <File path="src/common/vsync.v" type="file.verilog" enable="1"/>
         <File path="src/mono_8x8/charbuf_mono_64x64/charbuf_mono_64x64.v" type="file.verilog" enable="1"/>
-        <File path="src/mono_8x8/rom_font_1bit/rom_font_1bit.v" type="file.verilog" enable="0"/>
-        <File path="src/mono_8x8/text_1bit.v" type="file.verilog" enable="0"/>
         <File path="src/mono_8x8/top.v" type="file.verilog" enable="1"/>
         <File path="src/common/lcd.cst" type="file.cst" enable="1"/>
-        <File path="src/mono_8x8/cp437_1bit.mi" type="file.other" enable="1"/>
     </FileList>
 </Project>

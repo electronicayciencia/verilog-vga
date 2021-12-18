@@ -1,14 +1,16 @@
 // Delay a bit signal 2 clock cycles
+// version with temporary variable to show how non-blocking assignments work
 module delaybit_2tic (
     input clk,
     input in,
-    output out
+    output reg out
 );
 
-reg [1:0] d = 0;
-assign out = d[1];
+reg tmp;
 
-always @(posedge clk) 
-    d <= {d[0], in};
+always @(posedge clk) begin
+    tmp <= in;
+    out <= tmp;
+end
 
 endmodule

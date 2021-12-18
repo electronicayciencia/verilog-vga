@@ -116,16 +116,18 @@ delayvector3_1tic delay_ycell(
     .out  (y_cell_delayed)
 );
 
+
 // Character generator, monochrome, 8x8 font
 wire on;
-text_1bit text(
-    .i_x(x_cell_delayed),    // horizontal coordinate
-    .i_y(y_cell_delayed),    // vertical coordinate
-    .i_chr(character),       // character number
-    .i_clk(LCD_CLK),         // clock
-    .o_out(on)               // pixel is on or off
+wire [13:0] rom_addr = {character, y_cell_delayed, x_cell_delayed}; // 256 chars, 8 rows, 8 cols
+rom_font_1bit rom_font_1bit(
+    .ad       (rom_addr), //[13:0] address
+    .clk      (LCD_CLK),
+    .dout     (on),       // 1 bit
+    .oce      (true),
+    .ce       (true),
+    .reset    (false)
 );
-
 
 assign LCD_R = {5{on}};
 assign LCD_G = {6{on}};

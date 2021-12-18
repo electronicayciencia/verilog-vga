@@ -5,7 +5,8 @@ module delayvector3_1tic (
     output reg [2:0] out
 );
 
-always @(posedge clk) 
+always @(posedge clk) begin
     out <= in;
+end
 
 endmodule

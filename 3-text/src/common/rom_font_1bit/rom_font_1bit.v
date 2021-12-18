@@ -4,7 +4,7 @@
 //GOWIN Version: V1.9.8
 //Part Number: GW1N-LV1QN48C6/I5
 //Device: GW1N-1
-//Created Time: Fri Dec 17 11:53:06 2021
+//Created Time: Sat Dec 18 21:40:54 2021
 
 module rom_font_1bit (dout, clk, oce, ce, reset, ad);
 
