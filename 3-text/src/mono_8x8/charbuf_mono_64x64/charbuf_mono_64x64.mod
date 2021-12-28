@@ -6,7 +6,7 @@
 
 -mod_name charbuf_mono_64x64
 -file_name charbuf_mono_64x64
--path D:/Documentos/GitHub/verilog-vga/3-text/src/text_1bit/charbuf_mono_64x64/
+-path D:/Documentos/GitHub/verilog-vga/3-text/src/mono_8x8/charbuf_mono_64x64/
 -type RAM_SDP
 -file_type vlg
 -bram_b true
@@ -16,5 +16,3 @@
 -width_1 8
 -read_mode bypass
 -reset_mode sync
--init_file D:/Documentos/GitHub/verilog-vga/3-text/src/text_1bit/jabberwocky.mi
--init_match port_A

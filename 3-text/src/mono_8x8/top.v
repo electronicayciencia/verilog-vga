@@ -74,6 +74,16 @@ assign LCD_DEN   = enable_delayed;
 /*  Part III: Text
 /*************************************/
 
+// Demo module. Write into character buffer.
+wire [11:0] aram_addr;
+wire [7:0] aram_data;
+wire cea;
+demo demo (
+    .i_clk      (vsync_timed),
+    .o_address  (aram_addr),
+    .o_data     (aram_data),
+    .o_we       (cea)
+);
 
 
 // Character buffer
@@ -81,10 +91,10 @@ wire [11:0] buff_addr = {y[8:3], x[8:3]};
 wire [7:0] character;
 charbuf_mono_64x64 charbuf_mono_64x64(
     //A port: write
-    .ada       (12'b0),      //input [11:0] A address
-    .din       (8'b0),       //input [7:0]  Data in
+    .ada       (aram_addr),  //input [11:0] A address
+    .din       (aram_data),  //input [7:0]  Data in
     .clka      (LCD_CLK),    //input clock for A port
-    .cea       (false),      //input clock enable for A
+    .cea       (cea),        //input clock enable for A
     .reseta    (false),      //input reset for A
 
     //B port: read
@@ -97,6 +107,7 @@ charbuf_mono_64x64 charbuf_mono_64x64(
     //Global
     .oce       (true)        //input Output Clock Enable (not used in bypass mode)
 );
+
 
 // Delay inner cell coordinates to wait for character buffer.
 wire [2:0] x_cell_timed = x[2:0];

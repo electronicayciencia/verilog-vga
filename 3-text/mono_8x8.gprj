@@ -12,6 +12,7 @@
         <File path="src/common/rom_font_1bit/rom_font_1bit.v" type="file.verilog" enable="1"/>
         <File path="src/common/vsync.v" type="file.verilog" enable="1"/>
         <File path="src/mono_8x8/charbuf_mono_64x64/charbuf_mono_64x64.v" type="file.verilog" enable="1"/>
+        <File path="src/mono_8x8/demo.v" type="file.verilog" enable="1"/>
         <File path="src/mono_8x8/top.v" type="file.verilog" enable="1"/>
         <File path="src/common/lcd.cst" type="file.cst" enable="1"/>
     </FileList>
