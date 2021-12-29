@@ -11,14 +11,13 @@ module top (
 
 wire false = 1'b0;
 wire true = 1'b1;
-assign LCD_CLK = XTAL_IN;
-/*
+
 Gowin_rPLL pll(
     .clkin     (XTAL_IN),      // input clkin 24MHz
     .clkout    (),             // output clkout
     .clkoutd   (LCD_CLK)       // divided output clock
 );
-*/
+
 wire [8:0] x;
 wire [8:0] y;
 wire hde;
@@ -75,35 +74,23 @@ assign LCD_DEN   = enable_delayed;
 /*  Part III: Text
 /*************************************/
 
-// Demo module
-reg [12:0] counter = 0;
-wire [9:0] aram_addr;
-wire [7:0] aram_data;
-demo demo (
-    .i_status   (counter),
-    .i_clk      (LCD_CLK),
-    .o_address  (aram_addr),
-    .o_data     (aram_data)
-);
-
-always @(posedge vsync_timed)
-    counter <= counter + 1'b1;
-
-
-// Character buffer. Make the text bigger duplicating pixels
+// Color character buffer.
 wire [9:0] buff_addr = {y[8:4], x[8:4]};
-wire [7:0] character;
-charbuf_mono_32x32 charbuf_mono_32x32(
+wire [15:0] buff_out;
+wire [7:0] character = buff_out[7:0];
+wire [7:0] attribute = buff_out[15:8];
+
+charbuf_color_32x32 charbuf_color_32x32(
     //A port: write
-    .ada       (aram_addr),  //input [9:0] A address
-    .din       (aram_data),  //input [7:0]  Data in
+    .ada       (10'b0),      //input [9:0] A address
+    .din       (16'b0),      //input [15:0] Data in
     .clka      (LCD_CLK),    //input clock for A port
-    .cea       (true),       //input clock enable for A
+    .cea       (false),      //input clock enable for A
     .reseta    (false),      //input reset for A
 
     //B port: read
     .adb       (buff_addr),  //input [9:0] B address
-    .dout      (character),  //output [7:0] Data out
+    .dout      (buff_out),   //output [15:0] Data out
     .clkb      (LCD_CLK),    //input clock for B port
     .ceb       (true),       //input clock enable for B
     .resetb    (false),      //input reset for B
@@ -131,7 +118,7 @@ delayvector3_1tic delay_ycell(
     .out  (y_cell_delayed)
 );
 
-// Character generator, monochrome, 8x8 font
+// Character generator, 8x8 font
 wire on;
 wire [13:0] rom_addr = {character, y_cell_delayed, x_cell_delayed}; // 256 chars, 8 rows, 8 cols
 rom_font_1bit rom_font_1bit(
@@ -143,9 +130,13 @@ rom_font_1bit rom_font_1bit(
     .reset    (false)
 );
 
-
-assign LCD_R = {5{on}};
-assign LCD_G = {6{on}};
-assign LCD_B = {5{on}};
+// Color module
+color color (
+    .i_attr   (attribute), // Color attribute. irgb back (8b), irgb fore (8b)
+    .i_active (on),        // pixel active (foreground color) or background color
+    .o_red    (LCD_R),
+    .o_green  (LCD_G),
+    .o_blue   (LCD_B)
+);
 
 endmodule

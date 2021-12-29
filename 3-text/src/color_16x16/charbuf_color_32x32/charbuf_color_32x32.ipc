@@ -1,7 +1,7 @@
 [General]
 ipc_version=4
-file=charbuf_mono_32x32
-module=charbuf_mono_32x32
+file=charbuf_color_32x32
+module=charbuf_color_32x32
 target_device=gw1n1-004
 type=ram_sdpb
 version=1.0
@@ -10,10 +10,10 @@ version=1.0
 BYTE_SIZE=0
 DEPTH_A=1024
 DEPTH_B=1024
-DIMENSION_MATCH=65
 LANG=0
-MEM_FILE=../charbuf_mono_32x32_filled.mi
 READ=0
 RESET_MODE=true
-WIDTH_A=8
-WIDTH_B=8
+WIDTH_A=16
+WIDTH_B=16
+DIMENSION_MATCH=65
+MEM_FILE=../demo_color_30x17.mi
