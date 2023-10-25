@@ -16,3 +16,5 @@
 -width_1 8
 -read_mode bypass
 -reset_mode sync
+-init_file D:/Documentos/GitHub/verilog-vga/3-text/extras/holy_grenade.mi
+-init_match port_A

@@ -1,10 +1,10 @@
-//Copyright (C)2014-2021 Gowin Semiconductor Corporation.
+//Copyright (C)2014-2022 Gowin Semiconductor Corporation.
 //All rights reserved.
 //File Title: IP file
-//GOWIN Version: V1.9.8
+//GOWIN Version: V1.9.8.03
 //Part Number: GW1N-LV1QN48C6/I5
 //Device: GW1N-1
-//Created Time: Sat Dec 18 21:40:54 2021
+//Created Time: Wed Oct 25 20:33:37 2023
 
 module rom_font_1bit (dout, clk, oce, ce, reset, ad);
 

@@ -94,7 +94,7 @@ charbuf_mono_64x64 charbuf_mono_64x64(
     .ada       (aram_addr),  //input [11:0] A address
     .din       (aram_data),  //input [7:0]  Data in
     .clka      (LCD_CLK),    //input clock for A port
-    .cea       (cea),        //input clock enable for A
+    .cea       (false),        //input clock enable for A
     .reseta    (false),      //input reset for A
 
     //B port: read

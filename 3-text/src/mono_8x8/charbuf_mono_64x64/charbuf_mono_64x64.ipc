@@ -15,3 +15,5 @@ READ=0
 RESET_MODE=true
 WIDTH_A=8
 WIDTH_B=8
+DIMENSION_MATCH=65
+MEM_FILE=../../../extras/holy_grenade.mi
