@@ -65,9 +65,9 @@ delaybit_2tic delay_en(
     .out  (enable_delayed)
 );
 
-assign LCD_HSYNC = hsync_delayed;
-assign LCD_VSYNC = vsync_delayed;
-assign LCD_DEN   = enable_delayed;
+assign LCD_HSYNC = hsync_timed;
+assign LCD_VSYNC = vsync_timed;
+assign LCD_DEN   = enable_timed;
 
 
 /*************************************
@@ -91,7 +91,7 @@ demo demo (
 
 // Character buffer
 wire [11:0] buff_addr = {y[8:3], x[8:3]};
-wire [7:0] character;
+wire [7:0] character = 8'h61;
 
 charbuf_mono_64x64 charbuf_mono_64x64(
     // A port: write
@@ -119,34 +119,47 @@ wire [2:0] y_cell_timed = y[2:0];
 wire [2:0] x_cell_delayed;
 wire [2:0] y_cell_delayed;
 
-delayvector3_1tic delay_xcell(
-    .clk  (LCD_CLK),
-    .in   (x_cell_timed),
-    .out  (x_cell_delayed)
-);
+//delayvector3_1tic delay_xcell(
+//    .clk  (LCD_CLK),
+//    .in   (x_cell_timed),
+//    .out  (x_cell_delayed)
+//);
 
-delayvector3_1tic delay_ycell(
-    .clk  (LCD_CLK),
-    .in   (y_cell_timed),
-    .out  (y_cell_delayed)
-);
+//delayvector3_1tic delay_ycell(
+//    .clk  (LCD_CLK),
+//    .in   (y_cell_timed),
+//    .out  (y_cell_delayed)
+//);
 
 
 // Character generator, monochrome, 8x8 font
 wire on;
-wire [13:0] rom_addr = {character, y_cell_delayed, x_cell_delayed}; // 256 chars, 8 rows, 8 cols
+//wire [13:0] rom_addr = {character, y_cell_delayed, x_cell_delayed}; // 256 chars, 8 rows, 8 cols
 
-rom_font_1bit rom_font_1bit(
-    .ad       (rom_addr), //[13:0] address
-    .clk      (LCD_CLK),
-    .dout     (on),       // 1 bit
-    .oce      (true),
-    .ce       (true),
-    .reset    (false)
+//rom_font_1bit rom_font_1bit(
+//    .ad       (rom_addr), //[13:0] address
+//    .clk      (LCD_CLK),
+//    .dout     (on),       // 1 bit
+//    .oce      (true),
+//    .ce       (true),
+//    .reset    (false)
+//);
+
+x_y x_y(
+    .i_clk     (LCD_CLK),
+    .i_hsync   (~hsync_timed),
+    .i_vsync   (~vsync_timed),
+    .i_lcden   (enable_timed),
+    .o_char_x  (),
+    .o_char_y  (),
+    .o_cellnum (),
+    .o_pxen    (on)
 );
+
 
 assign LCD_R = {5{on}};
 assign LCD_G = {6{on}};
 assign LCD_B = {5{on}};
+
 
 endmodule
