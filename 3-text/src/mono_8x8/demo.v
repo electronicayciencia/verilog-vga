@@ -1,6 +1,7 @@
 // Demo for obsessively writing text to the RAM
 module demo (
     input i_clk,
+    input i_ena,
     output reg [11:0] o_address,
     output reg [7:0] o_data,
     output reg o_we
@@ -11,8 +12,8 @@ localparam maxlin = 33;
 
 //localparam len = 10;
 //localparam [len*8-1:0] text = "Nevermore\n";
-localparam len = 46;
-localparam [len*8-1:0] text = "All work and no play makes Jack a dull boy.\n  ";
+localparam len = 44;
+localparam [len*8-1:0] text = "All work and no play makes Jack a dull boy. ";
 
 
 reg [6:0] idx = 0;  // text index (from 0 to len)
@@ -36,7 +37,7 @@ always @(posedge i_clk)
 always @(posedge slowclock) begin
     o_address <= {lin, col};
     o_data    <= chr;
-    o_we      <= printable;
+    o_we      <= i_ena ? printable : 0;
 
     // update text position
     idx <= next_idx;

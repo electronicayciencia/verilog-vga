@@ -75,11 +75,14 @@ assign LCD_DEN   = enable_delayed;
 /*************************************/
 
 // Demo module. Write into character buffer.
+// Demo mode works better with a blank screen
 wire [11:0] aram_addr;
 wire [7:0] aram_data;
 wire cea;
+wire demo_mode = false;
 demo demo (
     .i_clk      (vsync_timed),
+    .i_ena      (demo_mode),
     .o_address  (aram_addr),
     .o_data     (aram_data),
     .o_we       (cea)
@@ -89,22 +92,23 @@ demo demo (
 // Character buffer
 wire [11:0] buff_addr = {y[8:3], x[8:3]};
 wire [7:0] character;
+
 charbuf_mono_64x64 charbuf_mono_64x64(
-    //A port: write
+    // A port: write
     .ada       (aram_addr),  //input [11:0] A address
     .din       (aram_data),  //input [7:0]  Data in
     .clka      (LCD_CLK),    //input clock for A port
-    .cea       (false),        //input clock enable for A
+    .cea       (cea),        //input clock enable for A
     .reseta    (false),      //input reset for A
 
-    //B port: read
+    // B port: read
     .adb       (buff_addr),  //input [11:0] B address
     .dout      (character),  //output [7:0] Data out
     .clkb      (LCD_CLK),    //input clock for B port
     .ceb       (true),       //input clock enable for B
     .resetb    (false),      //input reset for B
 
-    //Global
+    // Global
     .oce       (true)        //input Output Clock Enable (not used in bypass mode)
 );
 
@@ -131,6 +135,7 @@ delayvector3_1tic delay_ycell(
 // Character generator, monochrome, 8x8 font
 wire on;
 wire [13:0] rom_addr = {character, y_cell_delayed, x_cell_delayed}; // 256 chars, 8 rows, 8 cols
+
 rom_font_1bit rom_font_1bit(
     .ad       (rom_addr), //[13:0] address
     .clk      (LCD_CLK),

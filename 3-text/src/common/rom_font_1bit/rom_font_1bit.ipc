@@ -9,7 +9,7 @@ version=1.0
 [Config]
 DEPTH=16384
 LANG=0
-MEM_FILE=../cp437_1bit.mi
+MEM_FILE=../../../extras/fonts_8x8/vga_1bit.mi
 READ=0
 RESET_MODE=true
 WIDTH=1

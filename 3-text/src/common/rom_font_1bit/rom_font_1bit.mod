@@ -14,4 +14,4 @@
 -width 1
 -read_mode bypass
 -reset_mode sync
--init_file D:\Documentos\GitHub\verilog-vga\3-text\src\common\cp437_1bit.mi
+-init_file D:\Documentos\GitHub\verilog-vga\3-text\extras\fonts_8x8\vga_1bit.mi
