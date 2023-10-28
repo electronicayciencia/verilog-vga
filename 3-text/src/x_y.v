@@ -25,9 +25,9 @@ reg [12:0] y; //remove
 
 always @(negedge i_clk) begin
     if (i_hsync) begin
-        xcounter <= 0;
-        o_char_x <= 0;
-        x <= 0;
+        xcounter <= -2;
+        o_char_x <= -2;
+        x <= -2;
     end
     else begin
         if (i_lcden) begin
@@ -38,11 +38,11 @@ always @(negedge i_clk) begin
     end
 end
 
-always @(posedge i_hsync) begin
+always @(negedge i_hsync) begin
     if (i_vsync) begin
-        ycounter <= 0;
-        o_char_y <= 0;
-        y <= 0;
+        ycounter <= -3;
+        o_char_y <= -3;
+        y <= -3;
     end
     else begin
         ycounter <= (ycounter == max_cell_y) ? 1'b0 : ycounter + 1'b1;
@@ -51,6 +51,6 @@ always @(posedge i_hsync) begin
     end
 end
 
-assign o_pxen = y == 2; // xcounter <= max_char_x & ycounter <= max_char_y; 
+assign o_pxen = xcounter <= max_char_x & ycounter <= max_char_y; 
 
 endmodule

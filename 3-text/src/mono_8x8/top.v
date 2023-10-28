@@ -36,7 +36,7 @@ hsync hsync(
 );
 
 vsync vsync(
-    .i_clk     (LCD_HSYNC),  // counter clock
+    .i_clk     (hsync_timed),// counter clock
     .o_vsync   (vsync_timed),// vertical sync pulse
     .o_vde     (vde),        // vertical signal in active zone
     .o_y       (y)           // y pixel position
