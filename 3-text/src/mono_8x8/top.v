@@ -36,7 +36,7 @@ hsync hsync(
 );
 
 vsync vsync(
-    .i_clk     (LCD_HSYNC),  // counter clock
+    .i_clk     (hsync_timed),// counter clock
     .o_vsync   (vsync_timed),// vertical sync pulse
     .o_vde     (vde),        // vertical signal in active zone
     .o_y       (y)           // y pixel position
@@ -76,34 +76,37 @@ assign LCD_DEN   = enable_delayed;
 
 // Demo module. Write into character buffer.
 // Demo mode works better with a blank screen
-wire [11:0] aram_addr;
-wire [7:0] aram_data;
-wire cea;
-wire demo_mode = false;
+wire [11:0] vram_addr;
+wire [7:0]  vram_data;
+wire printable;
+wire demo_mode = true;
+
 demo demo (
     .i_clk      (vsync_timed),
-    .i_ena      (demo_mode),
-    .o_address  (aram_addr),
-    .o_data     (aram_data),
-    .o_we       (cea)
+    .i_ena      (demo_mode),   // enable module
+    .o_address  (vram_addr),   // video address to write
+    .o_data     (vram_data),   // character to write
+    .o_we       (printable)    // printable character
 );
 
 
-// Character buffer
-wire [11:0] buff_addr = {y[8:3], x[8:3]};
-wire [7:0] character;
+wire [7:0]  charnum;
+wire [5:0]  x_cell     = x[8:3];
+wire [5:0]  y_cell     = y[8:3];
+wire [11:0] video_addr = {y_cell, x_cell};
 
+// Character buffer
 charbuf_mono_64x64 charbuf_mono_64x64(
     // A port: write
-    .ada       (aram_addr),  //input [11:0] A address
-    .din       (aram_data),  //input [7:0]  Data in
+    .ada       (vram_addr),  //input [11:0] A address
+    .din       (vram_data),  //input [7:0]  Data in
     .clka      (LCD_CLK),    //input clock for A port
-    .cea       (cea),        //input clock enable for A
+    .cea       (printable),  //input clock enable for A
     .reseta    (false),      //input reset for A
 
     // B port: read
-    .adb       (buff_addr),  //input [11:0] B address
-    .dout      (character),  //output [7:0] Data out
+    .adb       (video_addr), //input [11:0] B address
+    .dout      (charnum),    //output [7:0] Data out
     .clkb      (LCD_CLK),    //input clock for B port
     .ceb       (true),       //input clock enable for B
     .resetb    (false),      //input reset for B
@@ -112,41 +115,42 @@ charbuf_mono_64x64 charbuf_mono_64x64(
     .oce       (true)        //input Output Clock Enable (not used in bypass mode)
 );
 
+// Character generator, monochrome, 8x8 font
+wire pxon;   // pixel is ON/OFF
 
-// Delay inner cell coordinates to wait for character buffer.
-wire [2:0] x_cell_timed = x[2:0];
-wire [2:0] y_cell_timed = y[2:0];
-wire [2:0] x_cell_delayed;
-wire [2:0] y_cell_delayed;
+wire [2:0] x_char = x[2:0];     // x position inside char
+wire [2:0] y_char = y[2:0];     // y position inside char
+wire [2:0] x_char_delayed;
+wire [2:0] y_char_delayed;
 
 delayvector3_1tic delay_xcell(
     .clk  (LCD_CLK),
-    .in   (x_cell_timed),
-    .out  (x_cell_delayed)
+    .in   (x_char),
+    .out  (x_char_delayed)
 );
 
 delayvector3_1tic delay_ycell(
     .clk  (LCD_CLK),
-    .in   (y_cell_timed),
-    .out  (y_cell_delayed)
+    .in   (y_char),
+    .out  (y_char_delayed)
 );
 
 
-// Character generator, monochrome, 8x8 font
-wire on;
-wire [13:0] rom_addr = {character, y_cell_delayed, x_cell_delayed}; // 256 chars, 8 rows, 8 cols
+// 256 chars, 8 rows, 8 cols => 8+3+3 = 14 bits
+wire [13:0] rom_addr = {charnum, y_char_delayed, x_char_delayed};
 
 rom_font_1bit rom_font_1bit(
-    .ad       (rom_addr), //[13:0] address
+    .ad       (rom_addr), // [13:0] address
     .clk      (LCD_CLK),
-    .dout     (on),       // 1 bit
-    .oce      (true),
-    .ce       (true),
+    .dout     (pxon),     // output is ON/OFF
+    .oce      (true),     // output enable
+    .ce       (true),     // chip enable
     .reset    (false)
 );
 
-assign LCD_R = {5{on}};
-assign LCD_G = {6{on}};
-assign LCD_B = {5{on}};
+
+assign LCD_R = {5{pxon}};
+assign LCD_G = {6{pxon}};
+assign LCD_B = {5{pxon}};
 
 endmodule
