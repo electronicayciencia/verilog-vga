@@ -91,22 +91,22 @@ demo demo (
 
 
 wire [7:0]  charnum;
-wire [5:0]  x_cell     = x[8:3];
-wire [4:0]  y_cell     = y[8:4];
+wire [5:0]  x_cell     = x[8:3];  // 60 cols
+wire [4:0]  y_cell     = y[8:4];  // 17 rows
 wire [10:0] video_addr = {y_cell, x_cell};
 
 // Character buffer
 charbuf_mono_64x32 charbuf_mono_64x32(
     // A port: write
-    .ada       (vram_addr),  //input [11:0] A address
-    .din       (vram_data),  //input [6:0]  Data in
+    .ada       (vram_addr),  //input [10:0] A address
+    .din       (vram_data),  //input [7:0]  Data in
     .clka      (LCD_CLK),    //input clock for A port
     .cea       (printable),  //input clock enable for A
     .reseta    (false),      //input reset for A
 
     // B port: read
-    .adb       (video_addr), //input [11:0] B address
-    .dout      (charnum),    //output [6:0] Data out
+    .adb       (video_addr), //input [10:0] B address
+    .dout      (charnum),    //output [7:0] Data out
     .clkb      (LCD_CLK),    //input clock for B port
     .ceb       (true),       //input clock enable for B
     .resetb    (false),      //input reset for B
@@ -115,7 +115,6 @@ charbuf_mono_64x32 charbuf_mono_64x32(
     .oce       (true)        //input Output Clock Enable (not used in bypass mode)
 );
 
-// Character generator, monochrome, 8x8 font
 wire pxon;   // pixel is ON/OFF
 
 wire [2:0] x_char = x[2:0];     // x position inside char
@@ -135,12 +134,12 @@ delayvector4_1tic delay_ycell(
     .out  (y_char_delayed)
 );
 
-
-// 256 chars, 8 rows, 8 cols => 8+3+3 = 14 bits
+// 256 chars, 16 rows, 8 cols => 8+4+3 = 15 bits
 wire [14:0] rom_addr = {charnum, y_char_delayed, x_char_delayed};
 
+// Character generator, monochrome, 8x16 font
 rom_font_1bit_8x16 rom_font_1bit_8x16(
-    .ad       (rom_addr), // [13:0] address
+    .ad       (rom_addr), // [14:0] address
     .clk      (LCD_CLK),
     .dout     (pxon),     // output is ON/OFF
     .oce      (true),     // output enable
