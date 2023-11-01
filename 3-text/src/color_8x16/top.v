@@ -133,14 +133,14 @@ rom_font_1bit_8x16 rom_font_1bit_8x16(
     .reset    (false)
 );
 
-reg [7:0] chatt_del;
+reg [7:0] chatt_delayed;
 always @(posedge LCD_CLK)
     chatt_delayed <= chatt;
 
 // Color module
 color color (
     .i_attr   (chatt_delayed), // Color attribute. irgb back (4b), irgb fore (4b)
-    .i_active (pxon),          // pixel active (foreground color) vs background color
+    .i_fg     (pxon),          // pixel active (foreground color) vs background color
     .o_red    (LCD_R),
     .o_green  (LCD_G),
     .o_blue   (LCD_B)
