@@ -74,66 +74,69 @@ assign LCD_DEN   = enable_delayed;
 /*  Part III: Text
 /*************************************/
 
-// Color character buffer.
-wire [9:0] buff_addr = {y[8:4], x[8:4]};
-wire [15:0] buff_out;
-wire [7:0] character = buff_out[7:0];
-wire [7:0] attribute = buff_out[15:8];
+wire [7:0]  chnum;
+wire [7:0]  chatt;
+wire [5:0]  x_cell     = x[8:3];  // 60 cols
+wire [4:0]  y_cell     = y[8:4];  // 17 rows
+wire [10:0] video_addr = {y_cell, x_cell};
 
-charbuf_color_32x32 charbuf_color_32x32(
-    //A port: write
-    .ada       (10'b0),      //input [9:0] A address
+// Character buffer
+charbuf_color_64x32 charbuf_color_64x32(
+    // A port: write
+    .ada       (11'b0),      //input [10:0] A address
     .din       (16'b0),      //input [15:0] Data in
     .clka      (LCD_CLK),    //input clock for A port
     .cea       (false),      //input clock enable for A
     .reseta    (false),      //input reset for A
 
-    //B port: read
-    .adb       (buff_addr),  //input [9:0] B address
-    .dout      (buff_out),   //output [15:0] Data out
+    // B port: read
+    .adb       (video_addr), //input [10:0] B address
+    .dout      ({chatt, chnum}),    //output [15:0] Data out
     .clkb      (LCD_CLK),    //input clock for B port
     .ceb       (true),       //input clock enable for B
     .resetb    (false),      //input reset for B
 
-    //Global
+    // Global
     .oce       (true)        //input Output Clock Enable (not used in bypass mode)
 );
 
+wire pxon;   // pixel is ON/OFF
 
-// Delay inner cell coordinates to wait for character buffer.
-wire [2:0] x_cell_timed = x[3:1];
-wire [2:0] y_cell_timed = y[3:1];
-wire [2:0] x_cell_delayed;
-wire [2:0] y_cell_delayed;
+wire [2:0] x_char = x[2:0];     // x position inside char
+wire [3:0] y_char = y[3:0];     // y position inside char (changed 2 to 3)
+wire [2:0] x_char_delayed;
+wire [3:0] y_char_delayed;
 
 delayvector3_1tic delay_xcell(
     .clk  (LCD_CLK),
-    .in   (x_cell_timed),
-    .out  (x_cell_delayed)
+    .in   (x_char),
+    .out  (x_char_delayed)
 );
 
-delayvector3_1tic delay_ycell(
+delayvector4_1tic delay_ycell(
     .clk  (LCD_CLK),
-    .in   (y_cell_timed),
-    .out  (y_cell_delayed)
+    .in   (y_char),
+    .out  (y_char_delayed)
 );
 
-// Character generator, 8x8 font
-wire on;
-wire [13:0] rom_addr = {character, y_cell_delayed, x_cell_delayed}; // 256 chars, 8 rows, 8 cols
-rom_font_1bit rom_font_1bit(
-    .ad       (rom_addr), //[13:0] address
+
+// 256 chars, 16 rows, 8 cols => 8+4+3 = 15 bits
+wire [14:0] rom_addr = {chnum, y_char_delayed, x_char_delayed};
+
+// Character generator, monochrome, 8x16 font
+rom_font_1bit_8x16 rom_font_1bit_8x16(
+    .ad       (rom_addr), // [14:0] address
     .clk      (LCD_CLK),
-    .dout     (on),       // 1 bit
-    .oce      (true),
-    .ce       (true),
+    .dout     (pxon),     // output is ON/OFF
+    .oce      (true),     // output enable
+    .ce       (true),     // chip enable
     .reset    (false)
 );
 
 // Color module
 color color (
-    .i_attr   (attribute), // Color attribute. irgb back (8b), irgb fore (8b)
-    .i_active (on),        // pixel active (foreground color) or background color
+    .i_attr   (chatt),    // Color attribute. irgb back (8b), irgb fore (8b)
+    .i_active (pxon),     // pixel active (foreground color) vs background color
     .o_red    (LCD_R),
     .o_green  (LCD_G),
     .o_blue   (LCD_B)
