@@ -1,8 +1,8 @@
 // Receive CGA color to drive LCD output R(5)G(6)B(5)
 // "pixel on" signal select between foreground or background color.
 module color (
-    input  [7:0] i_attr,    // Color attribute. irgb back (8b), irgb fore (8b)
-    input        i_active,  // pixel active (foreground color) or background color
+    input  [7:0] i_attr,   // Color attribute. irgb back (8b), irgb fore (8b)
+    input        i_active, // pixel active (foreground color) or background color
     output [4:0] o_red,
     output [5:0] o_green,
     output [4:0] o_blue

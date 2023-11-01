@@ -16,5 +16,5 @@
 -width_1 16
 -read_mode bypass
 -reset_mode sync
--init_file D:\Documentos\GitHub\verilog-vga\3-text\extras\demo_color\demo_color_60x17.mi
+-init_file D:\Documentos\GitHub\verilog-vga\3-text\extras\demo_color\demo_60x17.mi
 -init_match port_A
