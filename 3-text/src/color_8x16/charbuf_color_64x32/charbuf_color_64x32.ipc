@@ -16,4 +16,4 @@ RESET_MODE=true
 WIDTH_A=16
 WIDTH_B=16
 DIMENSION_MATCH=65
-MEM_FILE=../../../extras/demo_color/demo_60x17.mi
+MEM_FILE=../../../extras/demo_color/random_60x17.mi
