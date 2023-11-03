@@ -15,11 +15,14 @@ module color_blink (
 );
 
 assign {i,r,g,b} = i_ble ? 
-                   i_fg & (i_blink | ~i_attr[7]) ? i_attr[3:0] : {0, i_attr[6:4]} :
-                   i_fg ? i_attr[3:0] : i_attr[7:4];
+                   (i_fg & (i_blink | ~i_attr[7]) ? i_attr[3:0] : {0, i_attr[6:4]}) :
+                   (i_fg ? i_attr[3:0] : i_attr[7:4]);
 
 assign o_red   = { r, i, r, i, r };
-assign o_green = { g, i, g, i, g, i };
 assign o_blue  = { b, i, b, i, b };
+
+// Brown exception: turn green from AA to 55 if the color is 6
+assign o_green = {i,r,g,b} != 4'b0110 ? { g, i, g, i, g, i } : 5'b010101;
+
 
 endmodule

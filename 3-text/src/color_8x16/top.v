@@ -149,23 +149,18 @@ color color (
 );
 */
 
-// VGA blinks every 16 frames (1.8Hz @ 60Hz)
-reg [8:0] bl_cnt;
-reg blink;
-always @(posedge LCD_VSYNC) begin
-    if (bl_cnt == 16) begin
-        bl_cnt <= 0;
-        blink = ~blink;
-    end
-    else
-        bl_cnt = bl_cnt + 1'b1;
-end
+wire blinkline;
+
+blinker blinker (
+    .i_vsync  (LCD_VSYNC), // frame
+    .o_bl     (blinkline)  // blinking line
+);
 
 // Color&blink module
 color_blink color_blink (
     .i_attr   (chatt_delayed), // Color attribute. irgb back (4b), irgb fore (4b)
     .i_fg     (pxon),          // pixel active (foreground color) vs background color
-    .i_blink  (blink),         // blinking line
+    .i_blink  (blinkline),     // blinking line
     .i_ble    (BTN_A),         // blink enable
     .o_red    (LCD_R),
     .o_green  (LCD_G),
