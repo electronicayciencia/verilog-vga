@@ -50,7 +50,7 @@ Draw images from ROM or RAM.
 
 Repository:
 
-- [2. Images](1-image)
+- [2. Images](2-image)
 
 Main post (spanish): 
 
@@ -85,3 +85,45 @@ Filling screen with textures.
 ![](https://www.electronicayciencia.com/assets/2021/12/lcd_tang_nano_II_imagenes//img/led_counter.gif)
 
 
+## Part III: Text
+
+Draw text in 8x8 b/w or 8x16 b/w and color.
+
+Repository:
+
+- [3. Text](3-text)
+
+Main post (spanish): 
+
+- Coming soon...
+
+3 sub-projects:
+
+### Text monochrome 8x8
+
+To learn how a character generator works.
+
+![](https://www.electronicayciencia.com/assets/2023/11/lcd_tang_nano_III_texto/img/text_8x8_delay.jpg)
+
+Use demo mode to learn how to write characters into the screen buffer.
+
+<video autoplay="" loop="" muted="">
+<source src="https://www.electronicayciencia.com/assets/2023/11/lcd_tang_nano_III_texto/video/shinning8x8.mp4" type="video/mp4">
+Your browser does not support the video tag.
+</video>
+
+### Text monochrome 8x16
+
+Better characters.
+
+![](https://www.electronicayciencia.com/assets/2023/11/lcd_tang_nano_III_texto/img/text_mono_8x16.jpg)
+
+### Text 8 bit color 8x16
+
+Basic 8-bit color text.
+
+![](https://www.electronicayciencia.com/assets/2023/11/lcd_tang_nano_III_texto/img/full_color_text_8x16.jpg)
+
+Standard VGA palette and blinking text.
+
+![](https://www.electronicayciencia.com/assets/2023/11/lcd_tang_nano_III_texto/img/crash_screen.gif)
