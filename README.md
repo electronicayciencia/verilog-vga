@@ -107,10 +107,8 @@ To learn how a character generator works.
 
 Use demo mode to learn how to write characters into the screen buffer.
 
-<video autoplay="" loop="" muted="">
-<source src="https://www.electronicayciencia.com/assets/2023/11/lcd_tang_nano_III_texto/video/shinning8x8.mp4" type="video/mp4">
-Your browser does not support the video tag.
-</video>
+![](https://www.electronicayciencia.com/assets/2023/11/lcd_tang_nano_III_texto/img/shinning8x8.gif)
+
 
 ### Text monochrome 8x16
 
