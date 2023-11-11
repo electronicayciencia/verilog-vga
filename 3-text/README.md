@@ -4,7 +4,7 @@ Show text in 8x8 b/w or 8x16 b/w and color.
 
 Main post (spanish):
 
-- Coming soon...
+- [Gráficos VGA con FPGA Tang Nano parte III. Texto](https://www.electronicayciencia.com/2023/11/lcd_tang_nano_III_texto.html)
 
 ## Block diagram
 
