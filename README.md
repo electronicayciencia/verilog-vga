@@ -40,5 +40,5 @@ Repository:
 
 Main post (spanish):
 
-- Coming soon...
+- [Gráficos VGA con FPGA Tang Nano parte III. Texto](https://www.electronicayciencia.com/2023/11/lcd_tang_nano_III_texto.html)
 
