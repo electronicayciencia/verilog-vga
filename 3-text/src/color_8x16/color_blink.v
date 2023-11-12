@@ -14,8 +14,10 @@ module color_blink (
     output [4:0] o_blue
 );
 
+wire i, r, g, b;
+
 assign {i,r,g,b} = i_ble ? 
-                   (i_fg & (i_blink | ~i_attr[7]) ? i_attr[3:0] : {0, i_attr[6:4]}) :
+                   (i_fg & (i_blink | ~i_attr[7]) ? i_attr[3:0] : {1'b0, i_attr[6:4]}) :
                    (i_fg ? i_attr[3:0] : i_attr[7:4]);
 
 assign o_red   = { r, i, r, i, r };
