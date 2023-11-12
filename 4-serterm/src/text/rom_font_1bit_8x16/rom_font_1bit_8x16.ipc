@@ -1,0 +1,15 @@
+[General]
+ipc_version=4
+file=rom_font_1bit_8x16
+module=rom_font_1bit_8x16
+target_device=gw1n1-004
+type=ram_prom
+version=1.0
+
+[Config]
+DEPTH=32768
+LANG=0
+MEM_FILE=../../../extras/fonts_8x16/vga8_16.mi
+READ=0
+RESET_MODE=true
+WIDTH=1
