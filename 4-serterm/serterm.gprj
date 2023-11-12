@@ -9,6 +9,6 @@
         <File path="src/uart/uart.v" type="file.verilog" enable="1"/>
         <File path="src/uart/uart_rx.v" type="file.verilog" enable="1"/>
         <File path="src/uart/uart_tx.v" type="file.verilog" enable="1"/>
-        <File path="src/fpga_project.cst" type="file.cst" enable="1"/>
+        <File path="src/serterm.cst" type="file.cst" enable="1"/>
     </FileList>
 </Project>

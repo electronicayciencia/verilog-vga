@@ -85,14 +85,14 @@ always @(posedge clk) begin
     end else begin
         if (prescale_reg > 0) begin
             s_axis_tready_reg <= 0;
-            prescale_reg <= prescale_reg - 1;
+            prescale_reg <= prescale_reg - 1'b1;
         end else if (bit_cnt == 0) begin
             s_axis_tready_reg <= 1;
             busy_reg <= 0;
 
             if (s_axis_tvalid) begin
                 s_axis_tready_reg <= !s_axis_tready_reg;
-                prescale_reg <= (prescale << 3)-1;
+                prescale_reg <= (prescale << 3)-1'b1;
                 bit_cnt <= DATA_WIDTH+1;
                 data_reg <= {1'b1, s_axis_tdata};
                 txd_reg <= 0;
@@ -100,8 +100,8 @@ always @(posedge clk) begin
             end
         end else begin
             if (bit_cnt > 1) begin
-                bit_cnt <= bit_cnt - 1;
-                prescale_reg <= (prescale << 3)-1;
+                bit_cnt <= bit_cnt - 1'b1;
+                prescale_reg <= (prescale << 3)-1'b1;
                 {data_reg, txd_reg} <= {1'b0, data_reg};
             end else if (bit_cnt == 1) begin
                 bit_cnt <= bit_cnt - 1;
