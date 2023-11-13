@@ -1,6 +1,5 @@
 // Generate blinking cursor
 module cursor (
-    input i_clk,                // clock
     input i_vsync,              // frame clock
     input [5:0] i_wr_cell_x,    // x coordinate of the writing cell
     input [4:0] i_wr_cell_y,    // y coordinate of the writing cell
