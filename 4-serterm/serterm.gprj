@@ -6,6 +6,7 @@
     <Device name="GW1N-1" pn="GW1N-LV1QN48C6/I5">gw1n1-004</Device>
     <FileList>
         <File path="src/text/charbuf_mono_64x32/charbuf_mono_64x32.v" type="file.verilog" enable="1"/>
+        <File path="src/text/cursor.v" type="file.verilog" enable="1"/>
         <File path="src/text/delaybit_2tic.v" type="file.verilog" enable="1"/>
         <File path="src/text/delayvector3_1tic.v" type="file.verilog" enable="1"/>
         <File path="src/text/delayvector4_1tic.v" type="file.verilog" enable="1"/>
