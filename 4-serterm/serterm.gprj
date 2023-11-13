@@ -19,5 +19,7 @@
         <File path="src/uart/uart_rx.v" type="file.verilog" enable="0"/>
         <File path="src/uart/uart_tx.v" type="file.verilog" enable="0"/>
         <File path="src/lcd.cst" type="file.cst" enable="1"/>
+        <File path="src/control/README.md" type="file.other" enable="1"/>
+        <File path="src/text/README.md" type="file.other" enable="1"/>
     </FileList>
 </Project>
