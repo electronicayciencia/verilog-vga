@@ -1,23 +1,37 @@
+/*
+This module creates the text engine and instanciate the video memory.
+*/
 module text (
-    input XTAL_IN,       // 24 MHz
-    output [4:0] LCD_R,
-    output [5:0] LCD_G,
-    output [4:0] LCD_B,
-    output LCD_HSYNC,
-    output LCD_VSYNC,
-    output LCD_CLK,
-    output LCD_DEN
+    input i_clk,       // 24 MHz
+    // VRAM write port
+    input [10:0]    i_vram_addr,
+    input  [7:0]    i_vram_data,
+    input           i_vram_ce,
+    // LCD signals
+    output [4:0]    o_LCD_R,
+    output [5:0]    o_LCD_G,
+    output [4:0]    o_LCD_B,
+    output          o_LCD_HSYNC,
+    output          o_LCD_VSYNC,
+    output          o_LCD_CLK,
+    output          o_LCD_DEN
 );
+
 
 wire false = 1'b0;
 wire true = 1'b1;
 
-Gowin_rPLL pll(
-    .clkin     (XTAL_IN),      // input clkin 24MHz
-    .clkout    (),             // output clkout
-    .clkoutd   (LCD_CLK)       // divided output clock
-);
+// Let LCD clock be 24/2 = 12MHz
+wire   LCD_CLK = CLK_12MHZ;
+assign o_LCD_CLK = LCD_CLK;
 
+reg CLK_12MHZ;
+always @(posedge i_clk) begin
+    CLK_12MHZ = CLK_12MHZ + 1'b1;
+end    
+
+
+// Coordinates
 wire [8:0] x;
 wire [8:0] y;
 wire hde;
@@ -65,9 +79,9 @@ delaybit_2tic delay_en(
     .out  (enable_delayed)
 );
 
-assign LCD_HSYNC = hsync_delayed;
-assign LCD_VSYNC = vsync_delayed;
-assign LCD_DEN   = enable_delayed;
+assign o_LCD_HSYNC = hsync_delayed;
+assign o_LCD_VSYNC = vsync_delayed;
+assign o_LCD_DEN   = enable_delayed;
 
 
 /*************************************
@@ -76,20 +90,6 @@ assign LCD_DEN   = enable_delayed;
 
 // Demo module. Write into character buffer.
 // Demo mode works better with a blank screen
-wire [10:0] vram_addr;
-wire [7:0]  vram_data;
-wire printable;
-wire demo_mode = false;
-
-demo demo (
-    .i_clk      (vsync_timed),
-    .i_ena      (demo_mode),   // enable module
-    .o_address  (vram_addr),   // video address to write
-    .o_data     (vram_data),   // character to write
-    .o_we       (printable)    // printable character
-);
-
-
 wire [7:0]  charnum;
 wire [5:0]  x_cell     = x[8:3];  // 60 cols
 wire [4:0]  y_cell     = y[8:4];  // 17 rows
@@ -98,11 +98,11 @@ wire [10:0] video_addr = {y_cell, x_cell};
 // Character buffer
 charbuf_mono_64x32 charbuf_mono_64x32(
     // A port: write
-    .ada       (vram_addr),  //input [10:0] A address
-    .din       (vram_data),  //input [7:0]  Data in
-    .clka      (LCD_CLK),    //input clock for A port
-    .cea       (printable),  //input clock enable for A
-    .reseta    (false),      //input reset for A
+    .ada       (i_vram_addr), //input [10:0] A address
+    .din       (i_vram_data), //input [7:0]  Data in
+    .clka      (i_clk),       //input clock for A port
+    .cea       (i_vram_ce),   //input clock enable for A
+    .reseta    (false),       //input reset for A
 
     // B port: read
     .adb       (video_addr), //input [10:0] B address
@@ -148,8 +148,8 @@ rom_font_1bit_8x16 rom_font_1bit_8x16(
 );
 
 
-assign LCD_R = {5{pxon}};
-assign LCD_G = {6{pxon}};
-assign LCD_B = {5{pxon}};
+assign o_LCD_R = {5{pxon}};
+assign o_LCD_G = {6{pxon}};
+assign o_LCD_B = {5{pxon}};
 
 endmodule
