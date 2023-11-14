@@ -5,7 +5,6 @@
     <Version>5</Version>
     <Device name="GW1N-1" pn="GW1N-LV1QN48C6/I5">gw1n1-004</Device>
     <FileList>
-        <File path="src/text/charbuf_mono_64x32/charbuf_mono_64x32.v" type="file.verilog" enable="1"/>
         <File path="src/text/cursor.v" type="file.verilog" enable="1"/>
         <File path="src/text/delaybit_2tic.v" type="file.verilog" enable="1"/>
         <File path="src/text/delayvector3_1tic.v" type="file.verilog" enable="1"/>
@@ -13,6 +12,7 @@
         <File path="src/text/hsync.v" type="file.verilog" enable="1"/>
         <File path="src/text/rom_font_1bit_8x16/rom_font_1bit_8x16.v" type="file.verilog" enable="1"/>
         <File path="src/text/text.v" type="file.verilog" enable="1"/>
+        <File path="src/text/vram/vram_m64x32.v" type="file.verilog" enable="1"/>
         <File path="src/text/vsync.v" type="file.verilog" enable="1"/>
         <File path="src/top.v" type="file.verilog" enable="1"/>
         <File path="src/uart/uart.v" type="file.verilog" enable="0"/>

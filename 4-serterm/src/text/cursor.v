@@ -17,7 +17,7 @@ always @(posedge i_vsync)
     ctr <= ctr + 1'b1;
 
 // Highlight bottom lines of the cell to write
-wire o_cursor = ctr[4] &                    // blinking
+assign o_cursor = ctr[4] &                   // blinking
                 (i_wr_cell_x == i_cell_x) & // same cell X
                 (i_wr_cell_y == i_cell_y) & // same cell Y
                 (i_char_y >= (15 - i_h));   // bottom lines

@@ -4,10 +4,12 @@ Also generates the cursor
 */
 module text (
     input i_clk,                    // Clock (24 MHz)
-    // VRAM write port
-    input [10:0]    i_vram_addr,    // VRAM write address {5'y, 6'x}
-    input  [7:0]    i_vram_data,    // VRAM write data
-    input           i_vram_ce,      // VRAM write enable
+    // VRAM port: for upper controller
+    input [10:0]    i_vram_addr,    // VRAM address {5'y, 6'x}
+    input  [7:0]    i_vram_din,     // VRAM data in
+    output [7:0]    i_vram_dout,    // VRAM data out
+    input           i_vram_ce,      // VRAM clock enable
+    input           i_vram_wre,     // VRAM write/read
     // Cursor options
     input           i_cursor_e,     // Cursor enable
     input  [3:0]    i_cursor_h,     // Cursor height in lines (max: 16)
@@ -100,24 +102,29 @@ wire [4:0]  y_cell     = y[8:4];  // 17 rows
 wire [10:0] video_addr = {y_cell, x_cell};
 
 // Character buffer
-charbuf_mono_64x32 charbuf_mono_64x32(
-    // A port: write
-    .ada       (i_vram_addr), //input [10:0] A address
-    .din       (i_vram_data), //input [7:0]  Data in
-    .clka      (i_clk),       //input clock for A port
-    .cea       (i_vram_ce),   //input clock enable for A
-    .reseta    (false),       //input reset for A
+vram_m64x32 vram(
+    // A port: for upper controller
+    .ada       (i_vram_addr),  //input [10:0] A address
+    .dina      (i_vram_din),   //input  [7:0] A data in
+    .douta     (i_vram_dout),  //output [7:0] A data out
+    .wrea      (i_vram_wre),   //input A write/read
+    .clka      (i_clk),        //input clock for A port 
+    .cea       (i_vram_ce),    //input clock enable for A
+    .reseta    (false),        //input reset for A
 
-    // B port: read
-    .adb       (video_addr), //input [10:0] B address
-    .dout      (charnum),    //output [7:0] Data out
-    .clkb      (LCD_CLK),    //input clock for B port
-    .ceb       (true),       //input clock enable for B
-    .resetb    (false),      //input reset for B
+    // B port: for VGA engine
+    .adb       (video_addr),   //input [10:0] B address
+    .dinb      (8'b0),         //input  [7:0] B data in
+    .doutb     (charnum),      //output [7:0] B data out
+    .wreb      (false),        //input B write/read
+    .clkb      (LCD_CLK),      //input clock for B port 
+    .ceb       (true),         //input clock enable for B
+    .resetb    (false),        //input reset for B
 
-    // Global
-    .oce       (true)        //input Output Clock Enable (not used in bypass mode)
+    .ocea      (true),         //input Output Clock Enable A (not used in bypass mode)
+    .oceb      (true)          //input Output Clock Enable B (not used in bypass mode)
 );
+
 
 
 wire [2:0] x_char = x[2:0];     // x position inside char
