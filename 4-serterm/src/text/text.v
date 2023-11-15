@@ -163,6 +163,8 @@ rom_font_1bit_8x16 rom_font_1bit_8x16(
 /*************************************/
 
 wire cur_on;
+wire cur_on_delayed;
+
 cursor cursor (
     .i_vsync        (o_LCD_VSYNC),          // frame clock
     .i_h            (i_cursor_h),           // cursor height in lines (0 = bottom, 15 = full)
