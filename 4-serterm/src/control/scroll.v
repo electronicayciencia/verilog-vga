@@ -1,4 +1,5 @@
 // Scroll a square section one line up.
+// Leave the cursor in the bottom rigth corner.
 module scroll (
     input i_clk,
     input i_start,             // assert high to start scrolling

@@ -3,11 +3,12 @@ This module creates the text engine and instanciate the video memory.
 Also generates the cursor
 */
 module text (
-    input i_clk,                    // Clock (24 MHz)
+    input i_clk,                    // Clock (12 MHz)
     // VRAM port: for upper controller
     input [10:0]    i_vram_addr,    // VRAM address {5'y, 6'x}
     input  [7:0]    i_vram_din,     // VRAM data in
     output [7:0]    i_vram_dout,    // VRAM data out
+    input           i_vram_clk,     // VRAM clock
     input           i_vram_ce,      // VRAM clock enable
     input           i_vram_wre,     // VRAM write/read
     // Cursor options
@@ -27,16 +28,6 @@ module text (
 wire false = 1'b0;
 wire true = 1'b1;
 
-// Let LCD clock be 24/2 = 12MHz
-wire   LCD_CLK = CLK_12MHZ;
-assign o_LCD_CLK = LCD_CLK;
-
-reg CLK_12MHZ;
-always @(posedge i_clk) begin
-    CLK_12MHZ = CLK_12MHZ + 1'b1;
-end    
-
-
 // Coordinates
 wire [8:0] x;
 wire [8:0] y;
@@ -49,7 +40,7 @@ wire vsync_timed;
 wire enable_timed = hde & vde;
 
 hsync hsync(
-    .i_clk     (LCD_CLK),    // counter clock
+    .i_clk     (i_clk),      // counter clock
     .o_hsync   (hsync_timed),// horizontal sync pulse
     .o_hde     (hde),        // horizontal signal in active zone
     .o_x       (x)           // x pixel position
@@ -68,19 +59,19 @@ wire vsync_delayed;
 wire enable_delayed;
 
 delaybit_2tic delay_h(
-    .clk  (LCD_CLK),
+    .clk  (i_clk),
     .in   (hsync_timed),
     .out  (hsync_delayed)
 );
 
 delaybit_2tic delay_v(
-    .clk  (LCD_CLK),
+    .clk  (i_clk),
     .in   (vsync_timed),
     .out  (vsync_delayed)
 );
 
 delaybit_2tic delay_en(
-    .clk  (LCD_CLK),
+    .clk  (i_clk),
     .in   (enable_timed),
     .out  (enable_delayed)
 );
@@ -88,7 +79,7 @@ delaybit_2tic delay_en(
 assign o_LCD_HSYNC = hsync_delayed;
 assign o_LCD_VSYNC = vsync_delayed;
 assign o_LCD_DEN   = enable_delayed;
-
+assign o_LCD_CLK   = i_clk;
 
 /*************************************
 /*  Part III: Text
@@ -108,7 +99,7 @@ vram_m64x32 vram(
     .dina      (i_vram_din),   //input  [7:0] A data in
     .douta     (i_vram_dout),  //output [7:0] A data out
     .wrea      (i_vram_wre),   //input A write/read
-    .clka      (i_clk),        //input clock for A port 
+    .clka      (i_vram_clk),   //input clock for A port 
     .cea       (i_vram_ce),    //input clock enable for A
     .reseta    (false),        //input reset for A
 
@@ -116,8 +107,8 @@ vram_m64x32 vram(
     .adb       (video_addr),   //input [10:0] B address
     .dinb      (8'b0),         //input  [7:0] B data in
     .doutb     (charnum),      //output [7:0] B data out
-    .wreb      (false),        //input B write/read
-    .clkb      (LCD_CLK),      //input clock for B port 
+    .wreb      (false),        //input B port is read-only
+    .clkb      (i_clk),        //input clock for B port 
     .ceb       (true),         //input clock enable for B
     .resetb    (false),        //input reset for B
 
@@ -133,13 +124,13 @@ wire [2:0] x_char_delayed;
 wire [3:0] y_char_delayed;
 
 delayvector3_1tic delay_xcell(
-    .clk  (LCD_CLK),
+    .clk  (i_clk),
     .in   (x_char),
     .out  (x_char_delayed)
 );
 
 delayvector4_1tic delay_ycell(
-    .clk  (LCD_CLK),
+    .clk  (i_clk),
     .in   (y_char),
     .out  (y_char_delayed)
 );
@@ -151,7 +142,7 @@ wire chr_on; // pixel is ON/OFF due to character generador
 // Character generator, monochrome, 8x16 font
 rom_font_1bit_8x16 rom_font_1bit_8x16(
     .ad       (rom_addr), // [14:0] address
-    .clk      (LCD_CLK),
+    .clk      (i_clk),
     .dout     (chr_on),   // output is ON/OFF
     .oce      (true),     // output enable
     .ce       (true),     // chip enable
@@ -179,7 +170,7 @@ cursor cursor (
 
 // Delay the cursor signal 2 tics
 delaybit_2tic delay_cur(
-    .clk  (LCD_CLK),
+    .clk  (i_clk),
     .in   (cur_on),
     .out  (cur_on_delayed)
 );

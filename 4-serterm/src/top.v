@@ -16,6 +16,19 @@ module top (
 wire false = 1'b0;
 wire true = 1'b1;
 
+// Use 24/2 = 12MHz for LCD and system clock.
+reg CLK_12MHZ;
+always @(posedge XTAL_IN) begin
+    CLK_12MHZ = ~CLK_12MHZ;
+end
+
+
+reg [32:0] ctr;
+wire slowclock = ctr[23];
+always @(negedge XTAL_IN)
+    ctr = ctr + 1'b1;
+
+
 
 wire vram_w;
 wire vram_ce;
@@ -27,12 +40,13 @@ wire  [7:0] vram_din;
 /* Generate LCD output for the text and cursor
    Provides the interface for write into the VRAM */
 text text(
-    .i_clk          (XTAL_IN),  // Clock (24 MHz)
+    .i_clk          (CLK_12MHZ),  // Clock (12 MHz)
 
     // VRAM port: for upper controller
     .i_vram_addr    (vram_addr),// VRAM address {5'y, 6'x}
     .i_vram_din     (vram_din), // VRAM data in
     .i_vram_dout    (vram_dout),// VRAM data out
+    .i_vram_clk     (CLK_12MHZ), // VRAM clock
     .i_vram_ce      (vram_ce),  // VRAM clock enable
     .i_vram_wre     (vram_w),   // VRAM write / read
 
@@ -52,16 +66,10 @@ text text(
 
 
 
-reg [32:0] ctr;
-wire slowclock = ctr[0];
-always @(negedge XTAL_IN)
-    ctr = ctr + 1'b1;
-
-
 reg scroll;
 reg [31:0] wait_time = 0;
-localparam [31:0] start_delay = 12_000_000;
-always @(negedge XTAL_IN) begin
+localparam [31:0] start_delay = 6_000_000;
+always @(negedge CLK_12MHZ) begin
     if (~BTN_A) begin
         if (wait_time == 0) begin
             scroll <= 1;
@@ -86,7 +94,7 @@ assign LED_G = ~(wait_time == 0);
 //assign LED_R = ~running;
 
 scroll scroll_m(
-    .i_clk          (XTAL_IN),
+    .i_clk          (CLK_12MHZ),
     .i_start        (scroll),        // assert high to start scrolling
     .o_running      (running),                    // busy
     .o_vram_addr    (vram_addr),

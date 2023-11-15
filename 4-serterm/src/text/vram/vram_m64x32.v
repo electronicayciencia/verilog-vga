@@ -4,7 +4,7 @@
 //GOWIN Version: V1.9.8.03
 //Part Number: GW1N-LV1QN48C6/I5
 //Device: GW1N-1
-//Created Time: Tue Nov 14 20:31:14 2023
+//Created Time: Wed Nov 15 21:33:16 2023
 
 module vram_m64x32 (douta, doutb, clka, ocea, cea, reseta, wrea, clkb, oceb, ceb, resetb, wreb, ada, dina, adb, dinb);
 
@@ -54,7 +54,7 @@ DPB dpb_inst_0 (
 
 defparam dpb_inst_0.READ_MODE0 = 1'b0;
 defparam dpb_inst_0.READ_MODE1 = 1'b0;
-defparam dpb_inst_0.WRITE_MODE0 = 2'b00;
+defparam dpb_inst_0.WRITE_MODE0 = 2'b01;
 defparam dpb_inst_0.WRITE_MODE1 = 2'b00;
 defparam dpb_inst_0.BIT_WIDTH_0 = 8;
 defparam dpb_inst_0.BIT_WIDTH_1 = 8;

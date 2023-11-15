@@ -20,5 +20,5 @@ RESET_MODE=true
 Speed=false
 WIDTH_A=8
 WIDTH_B=8
-WRITE_A=0
+WRITE_A=1
 WRITE_B=0
