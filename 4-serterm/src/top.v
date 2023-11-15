@@ -59,41 +59,53 @@ always @(negedge XTAL_IN)
 reg [4:0] row = 5;
 reg [5:0] col = 5;
 
-
 assign LED_G = ~(~running);
 assign LED_B = ~(running & ~writing);
 assign LED_R = ~(running & writing);
 
+/*
+endmodule
 
+module scroll (
+    input i_start,
+    input i_clk,
+    output o_ready,
+    output o_vram_w,
+    output o_vram_ce,
+    input  i_vram_dout,
+    output o_vram_din,
+
+
+);
+*/
 
 
 // Scroll
 localparam [4:0] first_line = 0;
 localparam [5:0] first_col  = 0;
 
-localparam [4:0] last_line = 17;
-localparam [5:0] last_col  = 60;
-
-reg running = 0;
-reg writing = 0;
-
-
-
-// write to row/col, read from row+1/col except if row is the last row
-assign vram_addr = writing ? {row, col} :
-                   row == last_line - 1 ? {row, col} :
-                   {row+1, col};
-
-assign vram_din  = row == last_line - 1 ? 0 : vram_dout;
-assign vram_w    = running & writing;
-assign vram_ce   = running;
+localparam [4:0] last_line = 16;
+localparam [5:0] last_col  = 59;
 
 wire start = ~BTN_A;
 // end condition: write char from the bottom-right to the upper row
-wire stop = (running & writing & row == last_line - 1 & col == last_col - 1);
+wire stop = (running & writing & row == last_line & col == last_col);
 
-wire [5:0] next_col = col != last_col - 1 ? col + 1'b1 : first_col;
-wire [4:0] next_row = col != last_col - 1 ? row : row + 1'b1;
+
+reg running = false;
+reg writing = false;
+
+// write to row/col, read from row+1/col except if row is the last row
+assign vram_addr = writing ? {row, col} :
+                   row == last_line ? {row, col} :
+                   {row+1, col};
+
+assign vram_din  = row == last_line ? 0 : vram_dout;
+assign vram_w    = running & writing;
+assign vram_ce   = running;
+
+wire [5:0] next_col = col == last_col ?  first_col : col + 1'b1;
+wire [4:0] next_row = col == last_col ? row + 1'b1 : row;
 
 always @(negedge slowclock) begin
     if (start & ~running) begin
