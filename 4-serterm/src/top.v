@@ -22,12 +22,12 @@ always @(posedge XTAL_IN) begin
     CLK_12MHZ = ~CLK_12MHZ;
 end
 
-
+/*
 reg [32:0] ctr;
 wire slowclock = ctr[23];
 always @(negedge XTAL_IN)
     ctr = ctr + 1'b1;
-
+*/
 
 
 wire vram_w;
@@ -43,60 +43,45 @@ text text(
     .i_clk          (CLK_12MHZ),  // Clock (12 MHz)
 
     // VRAM port: for upper controller
-    .i_vram_addr    (vram_addr),// VRAM address {5'y, 6'x}
-    .i_vram_din     (vram_din), // VRAM data in
-    .i_vram_dout    (vram_dout),// VRAM data out
-    .i_vram_clk     (CLK_12MHZ), // VRAM clock
-    .i_vram_ce      (vram_ce),  // VRAM clock enable
-    .i_vram_wre     (vram_w),   // VRAM write / read
+    .i_vram_addr    (vram_addr),  // VRAM address {5'y, 6'x}
+    .i_vram_din     (vram_din),   // VRAM data in
+    .i_vram_dout    (vram_dout),  // VRAM data out
+    .i_vram_clk     (CLK_12MHZ),  // VRAM clock
+    .i_vram_ce      (vram_ce),    // VRAM clock enable
+    .i_vram_wre     (vram_w),     // VRAM write / read
 
     // Cursor options
-    .i_cursor_e     (true),     // Cursor enable
-    .i_cursor_h     (4'd1),     // cursor lines (0 = bottom, 15 = full)
+    .i_cursor_e     (true),       // Cursor enable
+    .i_cursor_h     (4'd1),       // cursor lines (0 = bottom, 15 = full)
 
     // LCD signals
-    .o_LCD_R        (LCD_R),    // LCD red
-    .o_LCD_G        (LCD_G),    // LCD green
-    .o_LCD_B        (LCD_B),    // LCD blue
-    .o_LCD_HSYNC    (LCD_HSYNC),// LCD horizontal sync
-    .o_LCD_VSYNC    (LCD_VSYNC),// LCD vertical sync
-    .o_LCD_CLK      (LCD_CLK),  // LCD clock
-    .o_LCD_DEN      (LCD_DEN)   // LCD data enable
+    .o_LCD_R        (LCD_R),      // LCD red
+    .o_LCD_G        (LCD_G),      // LCD green
+    .o_LCD_B        (LCD_B),      // LCD blue
+    .o_LCD_HSYNC    (LCD_HSYNC),  // LCD horizontal sync
+    .o_LCD_VSYNC    (LCD_VSYNC),  // LCD vertical sync
+    .o_LCD_CLK      (LCD_CLK),    // LCD clock
+    .o_LCD_DEN      (LCD_DEN)     // LCD data enable
+);
+
+wire scroll_now;
+
+push_button push_button (
+    .i_btn   (~BTN_A),     // button active high
+    .i_delay (2_000_000),  // [31:0] ticks to wait for repeat
+    .i_clk   (CLK_12MHZ),
+    .o_pulse (scroll_now)  // output is high for 1 tick
 );
 
 
-
-reg scroll;
-reg [31:0] wait_time = 0;
-localparam [31:0] start_delay = 6_000_000;
-always @(negedge CLK_12MHZ) begin
-    if (~BTN_A) begin
-        if (wait_time == 0) begin
-            scroll <= 1;
-            wait_time <= start_delay;
-        end
-        else begin
-            scroll <= 0;
-            wait_time <= wait_time == 0 ? 0 : wait_time - 1'b1;
-        end
-    end
-    else begin
-        wait_time <= wait_time == 0 ? 0 : wait_time - 1'b1;
-        scroll <= 0;
-    end
-end
-
-
-
-wire running;
-assign LED_G = ~(wait_time == 0);
+//assign LED_G = ~(wait_time == 0);
 //assign LED_B = true;
 //assign LED_R = ~running;
 
 scroll scroll_m(
     .i_clk          (CLK_12MHZ),
-    .i_start        (scroll),        // assert high to start scrolling
-    .o_running      (running),                    // busy
+    .i_start        (scroll_now),  // assert high to start scrolling
+    .o_running      (running),     // busy
     .o_vram_addr    (vram_addr),
     .o_vram_w       (vram_w),
     .o_vram_ce      (vram_ce),
