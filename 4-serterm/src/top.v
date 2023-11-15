@@ -7,14 +7,21 @@ module top (
     output LCD_VSYNC,
     output LCD_CLK,
     output LCD_DEN,
-    input BTN_A
+    input BTN_A,
+    output LED_R,
+    output LED_G,
+    output LED_B
 );
 
 wire false = 1'b0;
 wire true = 1'b1;
 
-reg [4:0] row = 5'd0;
-reg [5:0] col = 6'd0;
+
+wire vram_w;
+wire vram_ce;
+wire [10:0] vram_addr;
+wire  [7:0] vram_dout;
+wire  [7:0] vram_din;
 
 
 /* Generate LCD output for the text and cursor
@@ -23,11 +30,11 @@ text text(
     .i_clk          (XTAL_IN),  // Clock (24 MHz)
 
     // VRAM port: for upper controller
-    .i_vram_addr    ({row, col}),// VRAM address {5'y, 6'x}
-    .i_vram_din     (8'b0),     // VRAM data in
-    .i_vram_dout    (),         // VRAM data out
-    .i_vram_ce      (false),    // VRAM clock enable
-    .i_vram_wre     (false),    // VRAM write / read
+    .i_vram_addr    (vram_addr),// VRAM address {5'y, 6'x}
+    .i_vram_din     (vram_din), // VRAM data in
+    .i_vram_dout    (vram_dout),// VRAM data out
+    .i_vram_ce      (vram_ce),  // VRAM clock enable
+    .i_vram_wre     (vram_w),   // VRAM write / read
 
     // Cursor options
     .i_cursor_e     (true),     // Cursor enable
@@ -44,42 +51,71 @@ text text(
 );
 
 
-/*
-localparam lines = 17;
-localparam cols  = 60;
+reg [32:0] ctr;
+wire slowclock = ctr[10];
+always @(negedge XTAL_IN)
+    ctr = ctr + 1'b1;
 
-always @(negedge BTN_A) begin
-    if (col == cols - 1)
-        row
-        col <= 0;
-    else
-        col <= col + 1'b1;
-end
-*/
+reg [4:0] row = 5;
+reg [5:0] col = 5;
+
+
+assign LED_G = ~(~running);
+assign LED_B = ~(running & ~writing);
+assign LED_R = ~(running & writing);
+
+
+
 
 // Scroll
-/*
-localparam STATE_IDLE = 0,
-           STATE_SCROLLING = 1
+localparam [4:0] first_line = 0;
+localparam [5:0] first_col  = 0;
 
-reg [4:0] old_row = 5'd0;
-reg [5:0] old_col = 6'd0;
+localparam [4:0] last_line = 17;
+localparam [5:0] last_col  = 60;
 
-reg status = STATE_IDLE;
-always @(negedge XTAL_IN) begin
-    if (status == STATE_IDLE) begin
-        status <= STATE_SCROLLING;
-        old_row <= row;
-        old_col <= col;
-        row <= 0;
-        col <= 0;
+reg running = 0;
+reg writing = 0;
+
+
+
+// write to row/col, read from row+1/col except if row is the last row
+assign vram_addr = writing ? {row, col} :
+                   row == last_line - 1 ? {row, col} :
+                   {row+1, col};
+
+assign vram_din  = row == last_line - 1 ? 0 : vram_dout;
+assign vram_w    = running & writing;
+assign vram_ce   = running;
+
+wire start = ~BTN_A;
+// end condition: write char from the bottom-right to the upper row
+wire stop = (running & writing & row == last_line - 1 & col == last_col - 1);
+
+wire [5:0] next_col = col != last_col - 1 ? col + 1'b1 : first_col;
+wire [4:0] next_row = col != last_col - 1 ? row : row + 1'b1;
+
+always @(negedge slowclock) begin
+    if (start & ~running) begin
+        row <= first_line;
+        col <= first_col;
+        running <= true;
+        writing <= false;
     end
 
-    if (status == STATE_SCROLLING) begin
-        row
-
+    else if (stop & running) begin
+        running <= false;
     end
 
+    else if (running) begin
+        if (writing) begin
+            col <= next_col;
+            row <= next_row;
+        end
+
+        writing <= ~writing;
+    end
 end
-*/
+
+
 endmodule
