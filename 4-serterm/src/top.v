@@ -26,23 +26,35 @@ clk_div clk_div (
 );
 
 
-wire        vram_w,    scroll_vram_w;
-wire        vram_ce,   scroll_vram_ce;
-wire [10:0] vram_addr, scroll_vram_addr;
-wire  [7:0] vram_dout, scroll_vram_dout;
-wire  [7:0] vram_din,  scroll_vram_din;
+wire        vram_w   , scroll_vram_w   , clear_vram_w      ;
+wire        vram_ce  , scroll_vram_ce  , clear_vram_ce     ;
+wire [10:0] vram_addr, scroll_vram_addr, clear_vram_addr   ;
+wire  [7:0] vram_dout, scroll_vram_dout, clear_vram_dout   ;
+wire  [7:0] vram_din , scroll_vram_din , clear_vram_din    ;
 
 reg [5:0] row = 0;
 reg [6:0] col = 0;
 
-wire scroll_start;
+wire scroll_start = false;
 wire scroll_running;
 
 // When a module is active, it takes the VRAM wires
-assign vram_w    = scroll_running ? scroll_vram_w    : false;
-assign vram_ce   = scroll_running ? scroll_vram_ce   : false;
-assign vram_addr = scroll_running ? scroll_vram_addr : {row,col};
-assign vram_din  = scroll_running ? scroll_vram_din  : false;
+assign vram_w    = scroll_running ? scroll_vram_w : 
+                   clear_running ? clear_vram_w : 
+                   false;
+
+assign vram_ce   = scroll_running ? scroll_vram_ce : 
+                   clear_running ? clear_vram_ce : 
+                   false;
+
+assign vram_addr = scroll_running ? scroll_vram_addr :
+                   clear_running ? clear_vram_addr : 
+                   {row,col};
+
+assign vram_din  = scroll_running ? scroll_vram_din :
+                   clear_running ? clear_vram_din : 
+                   false;
+
 assign scroll_vram_dout = scroll_running ? vram_dout : false;
 
 
@@ -50,7 +62,7 @@ push_button push_button (
     .i_btn   (~BTN_A),       // button active high
     .i_delay (2_000_000),    // [31:0] ticks to wait for repeat
     .i_clk   (CLK_12MHZ),
-    .o_pulse (scroll_start)  // output is high for 1 tick
+    .o_pulse (clear_start)   // output is high for 1 tick
 );
 
 
@@ -63,6 +75,17 @@ scroll scroll_m(
     .o_vram_ce      (scroll_vram_ce),
     .i_vram_dout    (scroll_vram_dout),
     .o_vram_din     (scroll_vram_din)
+);
+
+
+clear clear_m(
+    .i_clk          (CLK_12MHZ),
+    .i_start        (clear_start),     // assert high to start cleaning
+    .o_running      (clear_running),   // busy
+    .o_vram_addr    (clear_vram_addr),
+    .o_vram_w       (clear_vram_w),
+    .o_vram_ce      (clear_vram_ce),
+    .o_vram_din     (clear_vram_din)
 );
 
 

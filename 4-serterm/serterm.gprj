@@ -5,6 +5,7 @@
     <Version>5</Version>
     <Device name="GW1N-1" pn="GW1N-LV1QN48C6/I5">gw1n1-004</Device>
     <FileList>
+        <File path="src/control/clear.v" type="file.verilog" enable="1"/>
         <File path="src/control/clk_div.v" type="file.verilog" enable="1"/>
         <File path="src/control/scroll.v" type="file.verilog" enable="1"/>
         <File path="src/misc/push_button.v" type="file.verilog" enable="1"/>
