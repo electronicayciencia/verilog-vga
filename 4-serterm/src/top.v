@@ -16,13 +16,6 @@ module top (
 wire false = 1'b0;
 wire true = 1'b1;
 
-wire vram_w;
-wire vram_ce;
-wire [10:0] vram_addr;
-wire  [7:0] vram_dout;
-wire  [7:0] vram_din;
-
-wire scroll_now;
 wire CLK_12MHZ;
 
 // Use 24/2 = 12MHz for LCD and system clock.
@@ -33,11 +26,43 @@ clk_div clk_div (
 );
 
 
+wire        vram_w,    scroll_vram_w;
+wire        vram_ce,   scroll_vram_ce;
+wire [10:0] vram_addr, scroll_vram_addr;
+wire  [7:0] vram_dout, scroll_vram_dout;
+wire  [7:0] vram_din,  scroll_vram_din;
+
+reg [5:0] row = 0;
+reg [6:0] col = 0;
+
+wire scroll_start;
+wire scroll_running;
+
+// When a module is active, it takes the VRAM wires
+assign vram_w    = scroll_running ? scroll_vram_w    : false;
+assign vram_ce   = scroll_running ? scroll_vram_ce   : false;
+assign vram_addr = scroll_running ? scroll_vram_addr : {row,col};
+assign vram_din  = scroll_running ? scroll_vram_din  : false;
+assign scroll_vram_dout = scroll_running ? vram_dout : false;
+
+
 push_button push_button (
-    .i_btn   (~BTN_A),     // button active high
-    .i_delay (2_000_000),  // [31:0] ticks to wait for repeat
+    .i_btn   (~BTN_A),       // button active high
+    .i_delay (2_000_000),    // [31:0] ticks to wait for repeat
     .i_clk   (CLK_12MHZ),
-    .o_pulse (scroll_now)  // output is high for 1 tick
+    .o_pulse (scroll_start)  // output is high for 1 tick
+);
+
+
+scroll scroll_m(
+    .i_clk          (CLK_12MHZ),
+    .i_start        (scroll_start),     // assert high to start scrolling
+    .o_running      (scroll_running),   // busy
+    .o_vram_addr    (scroll_vram_addr),
+    .o_vram_w       (scroll_vram_w),
+    .o_vram_ce      (scroll_vram_ce),
+    .i_vram_dout    (scroll_vram_dout),
+    .o_vram_din     (scroll_vram_din)
 );
 
 
@@ -68,20 +93,6 @@ text text(
     .o_LCD_CLK      (LCD_CLK),    // LCD clock
     .o_LCD_DEN      (LCD_DEN)     // LCD data enable
 );
-
-
-
-scroll scroll_m(
-    .i_clk          (CLK_12MHZ),
-    .i_start        (scroll_now),  // assert high to start scrolling
-    .o_running      (running),     // busy
-    .o_vram_addr    (vram_addr),
-    .o_vram_w       (vram_w),
-    .o_vram_ce      (vram_ce),
-    .i_vram_dout    (vram_dout),
-    .o_vram_din     (vram_din)
-);
-
 
 //assign LED_G = ~(wait_time == 0);
 //assign LED_B = true;
