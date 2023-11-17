@@ -19,11 +19,6 @@ localparam true = 1'b1;
 
 
 
-
-/********************************/
-/* Modules and control
-/********************************/
-
 wire CLK_12MHZ;
 
 // Use 24/2 = 12MHz for LCD and system clock.
@@ -38,21 +33,142 @@ parameter first_row = 0;
 parameter last_col = 59;
 parameter last_row = 16;
 
-
-
 localparam char = 8'h41;
-wire putchar;                // we must put that char into the screen and advance cursor
-reg cursor_advance = false;  // we must advance the cursor
 
 reg [4:0] row = last_row;
 reg [5:0] col = first_col;
 
+
+wire clearhome_start;
+
+reg scroll_start = false;
+wire scroll_running;
+
+reg clear_start = false;
+wire clear_running;
+
+
+
+push_button m_BTN_A (
+    .i_btn   (~BTN_A),       // button active high
+    .i_delay (0_200_000),    // [31:0] ticks to wait for repeat
+    .i_clk   (CLK_12MHZ),
+    .o_pulse (putchar_start) // output is high for 1 tick
+);
+
+push_button m_BTN_B (
+    .i_btn   (~BTN_B),       // button active high
+    .i_delay (2_000_000),    // [31:0] ticks to wait for repeat
+    .i_clk   (CLK_12MHZ),
+    .o_pulse (clearhome_start)  // output is high for 1 tick
+);
+
+
+/********************************/
+/* Put character and advance cursor
+/********************************/
+reg putchar_running; // reclaim vram lines.
+reg [7:0] putchar_vram_din = char;
+reg putchar_vram_ce;
+reg putchar_vram_w;
+
+reg putchar_cursor_advance = false;
+
+always @(posedge CLK_12MHZ) begin
+    if (putchar_start) begin
+        putchar_vram_ce <= true;
+        putchar_vram_w <= true;
+        putchar_running <= true;
+        putchar_cursor_advance <= true;
+    end
+    else begin
+        putchar_vram_ce <= false;
+        putchar_vram_w <= false;
+        putchar_running <= false;
+        putchar_cursor_advance <= false;
+    end
+end
+
+
+/********************************/
+/* Clear the screen and home cursor
+/********************************/
+reg clearhome_running = false;
+reg clearhome_cursorhome = false; // to indicate homing the cursor
+
+always @(posedge CLK_12MHZ) begin
+    if (clearhome_start) begin
+        clearhome_running <= true;
+        clear_start <= true;
+    end
+    
+    if (clearhome_running) begin
+        if (clear_running) begin
+            clear_start <= false;
+            clearhome_running <= false;
+            clearhome_cursorhome <= true;
+        end
+    end
+    else begin
+        clearhome_cursorhome <= false;
+    end
+end
+
+
+/********************************/
+/* Cursor movement controler
+/*   Assign "row" and "col".
+/********************************/
+localparam 
+    IDLE = 0,    // don't touch the cursor
+    ADVANCE = 1, // advance one position, scroll if needed
+    HOME = 2;    // set to first row and first col
+
+reg [1:0] cursor_move = IDLE;
+
+always @(posedge CLK_12MHZ) begin
+    if (putchar_cursor_advance) cursor_move <= ADVANCE;
+    if (clearhome_cursorhome)   cursor_move <= HOME;
+    if (scroll_start)           scroll_start <= false;
+
+    if (cursor_move == ADVANCE) begin
+        cursor_move <= IDLE;
+        if (col == last_col) begin
+            col <= first_col;
+            if (row == last_row) begin
+                scroll_start <= true;
+            end
+            else begin
+                row <= row + 1'b1;
+            end
+        end
+        else begin
+            col <= col + 1'b1;
+        end
+    end
+    else if (cursor_move == HOME) begin
+        cursor_move <= IDLE;
+        col <= first_col;
+        row <= first_row;
+    end
+
+end
+
+
+
+
+/********************************/
+/* Modules and control
+/********************************/
+
+// Default values for vram lines
 reg vram_w  = false;
 reg vram_ce = false;
 wire [10:0] vram_addr = {row, col};
 wire  [7:0] vram_din = false;
 
 
+// VRAM lines are shared between all modules
 wire        common_vram_w,
             scroll_vram_w,
             clear_vram_w;
@@ -72,13 +188,6 @@ wire  [7:0] common_vram_dout,
 wire  [7:0] common_vram_din, 
             scroll_vram_din, 
             clear_vram_din;
-
-
-reg scroll_start = false;
-wire scroll_running;
-
-//reg clear_start = false;
-wire clear_running;
 
 
 // When a module is active, it takes the VRAM wires over idle signals
@@ -154,74 +263,6 @@ text text(
     .o_LCD_CLK      (LCD_CLK),    // LCD clock
     .o_LCD_DEN      (LCD_DEN)     // LCD data enable
 );
-
-
-
-push_button m_BTN_A (
-    .i_btn   (~BTN_A),       // button active high
-    .i_delay (0_200_000),    // [31:0] ticks to wait for repeat
-    .i_clk   (CLK_12MHZ),
-    .o_pulse (putchar_start) // output is high for 1 tick
-);
-
-push_button m_BTN_B (
-    .i_btn   (~BTN_B),       // button active high
-    .i_delay (2_000_000),    // [31:0] ticks to wait for repeat
-    .i_clk   (CLK_12MHZ),
-    .o_pulse (clear_start)  // output is high for 1 tick
-);
-
-
-
-
-/********************************/
-/* Put character and advance cursor
-/********************************/
-reg putchar_running; // reclaim vram lines.
-reg [7:0] putchar_vram_din = char;
-reg putchar_vram_ce;
-reg putchar_vram_w;
-
-always @(posedge CLK_12MHZ) begin
-    if (putchar_start) begin
-        putchar_vram_ce <= true;
-        putchar_vram_w <= true;
-        putchar_running <= true;
-        cursor_advance <= true;
-    end
-    else begin
-        putchar_vram_ce <= false;
-        putchar_vram_w <= false;
-        putchar_running <= false;
-        cursor_advance <= false;
-    end
-end
-
-/********************************/
-/* Cursor movement controler
-/*   Assign "row" and "col".
-/********************************/
-always @(posedge CLK_12MHZ) begin
-    if (cursor_advance) begin
-        if (col == last_col) begin
-            col <= first_col;
-            if (row == last_row) begin
-                scroll_start <= true;
-            end
-            else begin
-                row <= row + 1'b1;
-            end
-        end
-        else begin
-            col <= col + 1'b1;
-        end
-    end
-    else begin
-        scroll_start <= false;
-    end
-end
-
-
 
 
 
