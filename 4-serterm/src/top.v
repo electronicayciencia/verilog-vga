@@ -8,12 +8,12 @@ module top (
     output LCD_CLK,
     output LCD_DEN,
 //    output LED_R,
-//    output LED_G,
+    output LED_G,
 //    output LED_B,
-    input BTN_A,
-    input BTN_B,
-    input wire uart_rxd,
-    output wire uart_txd
+    input  BTN_A,
+    input  BTN_B,
+    input  RXD,
+    output TXD
 );
 
 localparam false = 1'b0;
@@ -66,7 +66,6 @@ control control (
 /* UART
 /**************************/
 
-
 reg [7:0] uart_tx_axis_tdata;
 reg uart_tx_axis_tvalid;
 wire uart_tx_axis_tready;
@@ -77,8 +76,8 @@ reg uart_rx_axis_tready;
 
 uart
 uart_inst (
-    .clk(XTAL_IN),
-    .rst(rst),
+    .clk(CLK_12MHZ),
+    .rst(clearhome_start),
     // AXI input
     .s_axis_tdata(uart_tx_axis_tdata),
     .s_axis_tvalid(uart_tx_axis_tvalid),
@@ -88,21 +87,23 @@ uart_inst (
     .m_axis_tvalid(uart_rx_axis_tvalid),
     .m_axis_tready(uart_rx_axis_tready),
     // uart
-    .rxd(uart_rxd),
-    .txd(uart_txd),
+    .rxd(RXD),
+    .txd(TXD),
     // status
     .tx_busy(),
     .rx_busy(),
     .rx_overrun_error(),
     .rx_frame_error(),
     // configuration
-    .prescale(125000000/(9600*8))
+    // prescale = 12_000_000/(1200*8)
+    .prescale(16'd1250)
 );
 
 //assign led = sw;
-//assign led = uart_tx_axis_tdata;
+assign LED_G = RXD;
 
-always @(posedge XTAL_IN or posedge rst) begin
+
+always @(posedge CLK_12MHZ or posedge rst) begin
     if (rst) begin
         uart_tx_axis_tdata <= 0;
         uart_tx_axis_tvalid <= 0;
