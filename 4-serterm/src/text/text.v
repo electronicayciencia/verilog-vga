@@ -178,8 +178,12 @@ delaybit_2tic delay_cur(
 // Cursor signal xor with current caracter
 wire pxon = chr_on ^ (i_cursor_e & cur_on_delayed); // pixel is ON/OFF
 
-assign o_LCD_R = {5{pxon}};
-assign o_LCD_G = {6{pxon}};
-assign o_LCD_B = {5{pxon}};
+parameter MASK_R = 5'b00000;
+parameter MASK_G = 6'b011111;
+parameter MASK_B = 5'b00000;
+
+assign o_LCD_R = {5{pxon}} & MASK_R;
+assign o_LCD_G = {6{pxon}} & MASK_G;
+assign o_LCD_B = {5{pxon}} & MASK_B;
 
 endmodule
