@@ -179,7 +179,7 @@ delaybit_2tic delay_cur(
 wire pxon = chr_on ^ (i_cursor_e & cur_on_delayed); // pixel is ON/OFF
 
 parameter MASK_R = 5'b00000;
-parameter MASK_G = 6'b011111;
+parameter MASK_G = 6'b011000;
 parameter MASK_B = 5'b00000;
 
 assign o_LCD_R = {5{pxon}} & MASK_R;

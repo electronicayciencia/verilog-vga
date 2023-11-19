@@ -79,15 +79,15 @@ uart_inst (
     // status
     .tx_busy(),
     .rx_busy(),
-    .rx_overrun_error(rx_overrun_error),
+    .rx_overrun_error(),
     .rx_frame_error(),
     // configuration
     // prescale = 12_000_000/(1200*8)
     .prescale(16'd1250)
 );
 
-assign LED_R = ~rx_overrun_error;
-assign LED_G = RXD;
+//assign LED_R = ~rx_overrun_error;
+//assign LED_G = RXD;
 
 
 control control (
@@ -107,23 +107,29 @@ control control (
 
 always @(posedge CLK_12MHZ) begin
     // putchar has no "running" signal
-    // assume it has enougth time between one byte and the next at 1200 bauds
+    // assume it has enough time between one byte and the next
     // then, ready to receive another byte
     if (putchar_start) begin
         putchar_start <= false;
-        uart_rx_axis_tready <= true;
+        uart_rx_axis_tready <= false;
     end
 
     // got one, clear ready signal
     // and put it into the screen
     else if (uart_rx_axis_tvalid) begin
-        uart_rx_axis_tready <= false;
+        uart_rx_axis_tready <= true;
         putchar_start <= true;
     end
 end
 
+/*
+
+// Detect sequence
+always @(posedge CLK_12MHZ) begin
 
 
+end
+*/
 
 endmodule
 
