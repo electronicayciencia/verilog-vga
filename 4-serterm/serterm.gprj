@@ -10,6 +10,7 @@
         <File path="src/control/control.v" type="file.verilog" enable="1"/>
         <File path="src/control/position.v" type="file.verilog" enable="1"/>
         <File path="src/control/scroll.v" type="file.verilog" enable="1"/>
+        <File path="src/keyb/tests.v" type="file.verilog" enable="1"/>
         <File path="src/misc/push_button.v" type="file.verilog" enable="1"/>
         <File path="src/text/cursor.v" type="file.verilog" enable="1"/>
         <File path="src/text/delaybit_2tic.v" type="file.verilog" enable="1"/>
@@ -22,12 +23,13 @@
         <File path="src/text/vsync.v" type="file.verilog" enable="1"/>
         <File path="src/top.v" type="file.verilog" enable="1"/>
         <File path="src/uart/uart.v" type="file.verilog" enable="1"/>
-        <File path="src/uart/uart_example.v.v" type="file.verilog" enable="0"/>
+        <File path="src/uart/uart_example.v" type="file.verilog" enable="0"/>
         <File path="src/uart/uart_rx.v" type="file.verilog" enable="1"/>
         <File path="src/uart/uart_tx.v" type="file.verilog" enable="1"/>
         <File path="src/lcd.cst" type="file.cst" enable="1"/>
         <File path="src/serterm.sdc" type="file.sdc" enable="1"/>
         <File path="src/control/README.md" type="file.other" enable="1"/>
+        <File path="src/keyb/README.md" type="file.other" enable="1"/>
         <File path="src/misc/README.md" type="file.other" enable="1"/>
         <File path="src/text/README.md" type="file.other" enable="1"/>
         <File path="src/uart/README.md" type="file.other" enable="1"/>

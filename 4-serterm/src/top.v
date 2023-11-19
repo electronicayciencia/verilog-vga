@@ -1,5 +1,6 @@
 module top (
     input XTAL_IN,       // 24 MHz
+
     output [4:0] LCD_R,
     output [5:0] LCD_G,
     output [4:0] LCD_B,
@@ -7,13 +8,19 @@ module top (
     output LCD_VSYNC,
     output LCD_CLK,
     output LCD_DEN,
+
     output LED_R,
     output LED_G,
     output LED_B,
+
     input  BTN_A,
     input  BTN_B,
-    input  RXD,
-    output TXD
+
+    input  RXD_PC,
+    output TXD_PC,
+
+    input  RXD_KEY,
+    output TXD_KEY
 );
 
 localparam false = 1'b0;
@@ -21,7 +28,7 @@ localparam true = 1'b1;
 
 localparam char = 8'h41;
 
-wire rst = false;
+wire rst;
 
 wire CLK_12MHZ;
 
@@ -31,14 +38,14 @@ clk_div clk_div (
     .i_factor(5'd0),     // 0: /2,  1: /4,  2: /8 ...
     .o_clk(CLK_12MHZ)
 );
-/*
+
 push_button m_BTN_A (
     .i_btn   (~BTN_A),         // button active high
     .i_delay (0_200_000),      // [31:0] ticks to wait for repeat
     .i_clk   (CLK_12MHZ),
-    .o_pulse (putchar_start)   // output is high for 1 tick
+    .o_pulse (rst)   // output is high for 1 tick
 );
-*/
+
 
 push_button m_BTN_B (
     .i_btn   (~BTN_B),         // button active high
@@ -52,7 +59,7 @@ reg putchar_start = 0;
 
 
 /**************************/
-/* UART
+/* UART for PC
 /**************************/
 
 wire [7:0] uart_rx_axis_tdata;
@@ -62,7 +69,7 @@ reg uart_rx_axis_tready = true;
 wire rx_overrun_error;
 
 uart
-uart_inst (
+uart_pc (
     .clk(CLK_12MHZ),
     .rst(clearhome_start),
     // AXI input
@@ -74,8 +81,8 @@ uart_inst (
     .m_axis_tvalid(uart_rx_axis_tvalid),
     .m_axis_tready(uart_rx_axis_tready),
     // uart
-    .rxd(RXD),
-    .txd(TXD),
+    .rxd(RXD_PC),
+    .txd(TXD_PC),
     // status
     .tx_busy(),
     .rx_busy(),
@@ -86,8 +93,6 @@ uart_inst (
     .prescale(16'd1250)
 );
 
-//assign LED_R = ~rx_overrun_error;
-//assign LED_G = RXD;
 
 
 control control (
@@ -122,14 +127,20 @@ always @(posedge CLK_12MHZ) begin
     end
 end
 
-/*
 
-// Detect sequence
-always @(posedge CLK_12MHZ) begin
+/*****************/
+/* Test keyboard
+/*****************/
+wire out;
+assign LED_G = ~out;
 
+keyb_tests keyb_tests (
+    .i_clk(CLK_12MHZ),
+    .rxd(RXD_KEY),
+    .txd(TXD_KEY),
+    .o_o(out)
+);
 
-end
-*/
 
 endmodule
 
