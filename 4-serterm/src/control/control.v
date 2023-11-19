@@ -13,16 +13,13 @@ module control (
     output       o_LCD_DEN
 );
 
-localparam false = 1'b0;
-localparam true = 1'b1;
 
-parameter first_col = 0;
-parameter first_row = 0;
-parameter last_col = 59;
-parameter last_row = 16;
+parameter false = 1'b0;
+parameter true = 1'b1;
 
-reg [4:0] row = last_row;
-reg [5:0] col = first_col;
+
+wire [4:0] row;
+wire [5:0] col;
 
 
 wire clearhome_start = i_clearhome;
@@ -86,45 +83,13 @@ always @(posedge i_clk) begin
 end
 
 
-/********************************/
-/* Cursor movement controler
-/*   Assign "row" and "col".
-/********************************/
-localparam 
-    IDLE = 0,    // don't touch the cursor
-    ADVANCE = 1, // advance one position, scroll if needed
-    HOME = 2;    // set to first row and first col
-
-reg [1:0] cursor_move = IDLE;
-
-always @(posedge i_clk) begin
-    if (putchar_cursor_advance) cursor_move <= ADVANCE;
-    if (clearhome_cursorhome)   cursor_move <= HOME;
-    if (scroll_start)           scroll_start <= false;
-
-    if (cursor_move == ADVANCE) begin
-        cursor_move <= IDLE;
-        if (col == last_col) begin
-            col <= first_col;
-            if (row == last_row) begin
-                scroll_start <= true;
-            end
-            else begin
-                row <= row + 1'b1;
-            end
-        end
-        else begin
-            col <= col + 1'b1;
-        end
-    end
-    else if (cursor_move == HOME) begin
-        cursor_move <= IDLE;
-        col <= first_col;
-        row <= first_row;
-    end
-
-end
-
+position position(
+    .i_clk         (i_clk),
+    .i_cmd_home    (clearhome_cursorhome),
+    .i_cmd_advance (putchar_cursor_advance),
+    .o_row         (row),
+    .o_col         (col)
+);
 
 
 
