@@ -36,44 +36,27 @@ wire clear_running;
 /* Put character and advance cursor
 /********************************/
 wire position_last_col, position_last_row;
+wire cursor_end = position_last_col & position_last_row;
+wire [7:0] putchar_vram_din;
+wire putchar_running,
+     putchar_vram_ce,
+     putchar_vram_w,
+     putchar_cursor_advance,
+     putchar_scroll_start,
+     putchar_need_scroll;
 
-reg putchar_running; // reclaim vram lines.
-wire [7:0] putchar_vram_din = i_char;
-reg putchar_vram_ce;
-reg putchar_vram_w;
-
-reg putchar_cursor_advance = false;
-reg putchar_scroll_start = false;
-reg putchar_need_scroll = false;
-
-always @(posedge i_clk) begin
-    // putchar & scroll cannot be sone at the same time
-    // delay the scroll one clock pulse
-    if (putchar_need_scroll) begin
-        putchar_scroll_start <= true;
-        putchar_need_scroll <= false;
-    end
-
-    if (putchar_scroll_start) begin
-        putchar_scroll_start <= false;
-    end
-
-    if (putchar_start) begin
-        putchar_vram_ce <= true;
-        putchar_vram_w <= true;
-        putchar_running <= true;
-        putchar_cursor_advance <= true;
-        if (position_last_col & position_last_row)
-            putchar_need_scroll <= true;
-
-    end
-    else begin
-        putchar_vram_ce <= false;
-        putchar_vram_w <= false;
-        putchar_running <= false;
-        putchar_cursor_advance <= false;
-    end
-end
+putchar putchar (
+    .i_clk       (i_clk),
+    .i_start     (i_putchar),             // assert high to set the char
+    .i_cursorend (cursor_end),
+    .i_char      (i_char),
+    .o_advance   (putchar_cursor_advance), // inform position module to update cursor
+    .o_scroll    (putchar_scroll_start),   // inform scroll module to scroll up
+    .o_running   (putchar_running),        // take vram lines
+    .o_vram_w    (putchar_vram_w),
+    .o_vram_ce   (putchar_vram_ce),
+    .o_vram_din  (putchar_vram_din)
+);
 
 
 /********************************/
