@@ -76,7 +76,7 @@ always @(i_byte, ctrl, shift, alt, meta) begin
 
             8'h1e: o_byte <= "!";  // Number 1
             8'h1f: o_byte <= "\""; // Number 2
-            8'h20: o_byte <= "·";  // Number 3
+            //8'h20: o_byte <= "·";  // Number 3
             8'h21: o_byte <= "$";  // Number 4
             8'h22: o_byte <= "%";  // Number 5
             8'h23: o_byte <= "&";  // Number 6

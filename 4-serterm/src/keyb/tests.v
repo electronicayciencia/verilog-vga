@@ -2,8 +2,7 @@
 module keyb_tests (
     input i_clk,       // 12 MHz
     input rxd,
-    output txd,
-    output o_o
+    output txd
 );
 
 
@@ -60,18 +59,5 @@ usbkeys usbkeys (
     .o_key        (uart_tx_axis_tdata)
 );
 
-
-
-/*
-assign scancode_ready = uart_tx_axis_tready;
-assign uart_tx_axis_tvalid = scancode_valid;
-assign uart_tx_axis_tdata = code;
-
-wire newchar_valid = uart_rx_axis_tvalid;
-assign uart_rx_axis_tready = newchar_ready;
-*/
-
-
-//assign o_o = status == CODE;
 
 endmodule

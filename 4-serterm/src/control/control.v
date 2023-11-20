@@ -25,7 +25,7 @@ wire [5:0] col;
 wire clearhome_start = i_clearhome;
 wire putchar_start   = i_putchar;
 
-reg scroll_start = false;
+wire scroll_start = putchar_scroll_start;
 wire scroll_running;
 
 reg clear_start = false;
@@ -35,19 +35,37 @@ wire clear_running;
 /********************************/
 /* Put character and advance cursor
 /********************************/
+wire position_last_col, position_last_row;
+
 reg putchar_running; // reclaim vram lines.
 wire [7:0] putchar_vram_din = i_char;
 reg putchar_vram_ce;
 reg putchar_vram_w;
 
 reg putchar_cursor_advance = false;
+reg putchar_scroll_start = false;
+reg putchar_need_scroll = false;
 
 always @(posedge i_clk) begin
+    // putchar & scroll cannot be sone at the same time
+    // delay the scroll one clock pulse
+    if (putchar_need_scroll) begin
+        putchar_scroll_start <= true;
+        putchar_need_scroll <= false;
+    end
+
+    if (putchar_scroll_start) begin
+        putchar_scroll_start <= false;
+    end
+
     if (putchar_start) begin
         putchar_vram_ce <= true;
         putchar_vram_w <= true;
         putchar_running <= true;
         putchar_cursor_advance <= true;
+        if (position_last_col & position_last_row)
+            putchar_need_scroll <= true;
+
     end
     else begin
         putchar_vram_ce <= false;
@@ -87,6 +105,8 @@ position position(
     .i_clk         (i_clk),
     .i_cmd_home    (clearhome_cursorhome),
     .i_cmd_advance (putchar_cursor_advance),
+    .o_last_row    (position_last_row),
+    .o_last_col    (position_last_col),
     .o_row         (row),
     .o_col         (col)
 );

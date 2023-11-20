@@ -9,12 +9,12 @@ module top (
     output LCD_CLK,
     output LCD_DEN,
 
-    output LED_R,
-    output LED_G,
-    output LED_B,
+//    output LED_R,
+//    output LED_G,
+//    output LED_B,
 
-    input  BTN_A,
-    input  BTN_B,
+//    input  BTN_A,
+//    input  BTN_B,
 
     input  RXD_PC,
     output TXD_PC,
@@ -28,7 +28,6 @@ localparam true = 1'b1;
 
 localparam char = 8'h41;
 
-wire rst;
 
 wire CLK_12MHZ;
 
@@ -39,6 +38,7 @@ clk_div clk_div (
     .o_clk(CLK_12MHZ)
 );
 
+/*
 push_button m_BTN_A (
     .i_btn   (~BTN_A),         // button active high
     .i_delay (0_200_000),      // [31:0] ticks to wait for repeat
@@ -53,7 +53,7 @@ push_button m_BTN_B (
     .i_clk   (CLK_12MHZ),
     .o_pulse (clearhome_start) // output is high for 1 tick
 );
-
+*/
 
 reg putchar_start = 0;
 
@@ -71,10 +71,10 @@ wire rx_overrun_error;
 uart
 uart_pc (
     .clk(CLK_12MHZ),
-    .rst(clearhome_start),
+    .rst(false),
     // AXI input
-    .s_axis_tdata(),
-    .s_axis_tvalid(),
+    .s_axis_tdata(8'b0),
+    .s_axis_tvalid(false),
     .s_axis_tready(),
     // AXI output
     .m_axis_tdata(uart_rx_axis_tdata),
@@ -131,14 +131,10 @@ end
 /*****************/
 /* Test keyboard
 /*****************/
-wire out;
-assign LED_G = ~out;
-
 keyb_tests keyb_tests (
     .i_clk(CLK_12MHZ),
     .rxd(RXD_KEY),
-    .txd(TXD_KEY),
-    .o_o(out)
+    .txd(TXD_KEY)
 );
 
 
