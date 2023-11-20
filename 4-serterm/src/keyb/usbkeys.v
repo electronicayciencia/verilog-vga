@@ -11,6 +11,16 @@ module usbkeys (
     output reg [7:0] o_key
 );
 
+
+wire [7:0] char;
+reg  [7:0] mask = 0;
+
+keymap keymap (
+    .i_byte (i_byte), // input byte
+    .i_mod  (mask),   // modifier
+    .o_byte (char)    // output
+);
+
 // Detect key
 // (57 AB 01) (00) (00) (2C)
 // Magic, mask, reserved, key scan code
@@ -25,7 +35,6 @@ localparam
 
 reg [1:0] status = LOOK;
 reg [3:0] idx   = 0;
-reg [7:0] mask  = 0;
 
 wire [7:0] first = magic[8*(LEN-1) +: 8]; 
 wire [7:0] next  = magic[8*(LEN-idx-1) +: 8];
@@ -74,7 +83,7 @@ always @(posedge i_clk) begin
                 o_byte_ready <= 0;
                 status <= LOOK;
                 o_key_valid <= 1;
-                o_key <= i_byte;  // <-- translate lookup table here
+                o_key <= char;  // <-- translate lookup table here
             end
         endcase
     end
