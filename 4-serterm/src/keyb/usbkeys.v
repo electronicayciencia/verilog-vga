@@ -1,5 +1,5 @@
 // Translate USB bytes to UART keys
-module keymap (
+module usbkeys (
     input            i_clk,
     // get a byte stream
     input      [7:0] i_byte,

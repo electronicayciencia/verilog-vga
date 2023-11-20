@@ -10,7 +10,7 @@
         <File path="src/control/control.v" type="file.verilog" enable="1"/>
         <File path="src/control/position.v" type="file.verilog" enable="1"/>
         <File path="src/control/scroll.v" type="file.verilog" enable="1"/>
-        <File path="src/keyb/keymap.v" type="file.verilog" enable="1"/>
+        <File path="src/keyb/usbkeys.v" type="file.verilog" enable="1"/>
         <File path="src/keyb/tests.v" type="file.verilog" enable="1"/>
         <File path="src/misc/push_button.v" type="file.verilog" enable="1"/>
         <File path="src/text/cursor.v" type="file.verilog" enable="1"/>

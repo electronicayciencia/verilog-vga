@@ -48,7 +48,7 @@ uart_inst (
 
 
 // Translate USB bytes to UART keys
-keymap keymap (
+usbkeys usbkeys (
     .i_clk        (i_clk),
     // get a byte stream
     .i_byte       (uart_rx_axis_tdata),
