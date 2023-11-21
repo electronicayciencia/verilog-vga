@@ -19,8 +19,8 @@ module top (
     input  RXD_PC,
     output TXD_PC,
 
-    input  RXD_KEY,
-    output TXD_KEY
+    input  RXD_KEYB,
+    output TXD_KEYB
 );
 
 localparam false = 1'b0;
@@ -66,16 +66,20 @@ wire [7:0] uart_rx_axis_tdata;
 wire uart_rx_axis_tvalid;
 reg uart_rx_axis_tready = true;
 
-wire rx_overrun_error;
+wire [7:0] uart_tx_axis_tdata;
+wire uart_tx_axis_tvalid;
+wire uart_tx_axis_tready;
+
+
 
 uart
 uart_pc (
     .clk(CLK_12MHZ),
     .rst(false),
     // AXI input
-    .s_axis_tdata(8'b0),
-    .s_axis_tvalid(false),
-    .s_axis_tready(),
+    .s_axis_tdata(uart_tx_axis_tdata),
+    .s_axis_tvalid(uart_tx_axis_tvalid),
+    .s_axis_tready(uart_tx_axis_tready),
     // AXI output
     .m_axis_tdata(uart_rx_axis_tdata),
     .m_axis_tvalid(uart_rx_axis_tvalid),
@@ -132,9 +136,11 @@ end
 /* Test keyboard
 /*****************/
 keyb_tests keyb_tests (
-    .i_clk(CLK_12MHZ),
-    .rxd(RXD_KEY),
-    .txd(TXD_KEY)
+    .i_clk        (CLK_12MHZ),
+    .i_rxd        (RXD_KEYB),
+    .i_data_ready (uart_tx_axis_tready),
+    .o_data_valid (uart_tx_axis_tvalid),
+    .o_data       (uart_tx_axis_tdata)  // mapped key
 );
 
 

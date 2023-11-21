@@ -24,8 +24,8 @@ keymap keymap (
 // Detect key
 // (57 AB 01) (00) (00) (2C)
 // Magic, mask, reserved, key scan code
-localparam LEN = 3;
-localparam [LEN*8-1:0] magic = "key";
+localparam LEN = 3; // len in bytes
+localparam [LEN*8-1:0] magic = 24'h57AB01;
 
 localparam 
     LOOK  = 2'd0, // looking for the magic sequence
@@ -79,11 +79,12 @@ always @(posedge i_clk) begin
 
         CODE:
             begin
-                // halt data flow until our scan code is received
-                o_byte_ready <= 0;
                 status <= LOOK;
-                o_key_valid <= 1;
-                o_key <= char;  // <-- translate lookup table here
+                if (char) begin // do nothing for char = 0 (key release)
+                    o_byte_ready <= 0; // halt data flow until our scan code is received
+                    o_key_valid <= 1;
+                    o_key <= char;  // <-- translate lookup table here
+                end
             end
         endcase
     end

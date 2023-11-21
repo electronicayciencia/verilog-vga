@@ -1,13 +1,14 @@
 /*
-Map USB scan code to 1 character
+Map USB HID scan code to characters
 1 key -> 1 character 
 Escape character keys are not supported 
 Spanish layout
+If the key is not mapped, return the original USB HID scan code.
 */
 module keymap (
     input      [7:0] i_byte, // input byte
     input      [7:0] i_mod,  // modifier
-    output reg [7:0] o_byte // output
+    output reg [7:0] o_byte  // output
 );
 
 localparam LCTRL  = 8'h01;
@@ -28,25 +29,29 @@ wire meta  = |( (i_mod & LMETA)  | (i_mod & RMETA)  );
 always @(i_byte, ctrl, shift, alt, meta) begin
     if (ctrl) begin
         case(i_byte)
-            default: o_byte <= "@";
+            8'h00: o_byte <= 0;
+            default: o_byte <= i_byte;
         endcase
     end
     else if (alt) begin
         case(i_byte)
-            default: o_byte <= "@";
+            8'h00: o_byte <= 0;
+            default: o_byte <= i_byte;
         endcase
     end
     else if (meta) begin
         case(i_byte)
+            8'h00: o_byte <= 0;
             8'h1e: o_byte <= "|";  // Number 1
             8'h1f: o_byte <= "@";  // Number 2
             8'h20: o_byte <= "#";  // Number 3
             8'h21: o_byte <= "~";  // Number 4
-            default: o_byte <= "@";
+            default: o_byte <= i_byte;
         endcase
     end
     else if (shift) begin
         case(i_byte)
+            8'h00: o_byte <= 0;
             8'h04: o_byte <= "A";
             8'h05: o_byte <= "B";
             8'h06: o_byte <= "C";
@@ -89,11 +94,12 @@ always @(i_byte, ctrl, shift, alt, meta) begin
             8'h36: o_byte <= ";";
             8'h37: o_byte <= ":";
 
-            default: o_byte <= "@";
+            default: o_byte <= i_byte;
         endcase
     end
     else begin
         case(i_byte)
+            8'h00: o_byte <= 0;
             8'h04: o_byte <= "a";
             8'h05: o_byte <= "b";
             8'h06: o_byte <= "c";
@@ -140,7 +146,7 @@ always @(i_byte, ctrl, shift, alt, meta) begin
             8'h36: o_byte <= ",";
             8'h37: o_byte <= ".";
 
-            default: o_byte <= "@";
+            default: o_byte <= i_byte;
         endcase
     end
 end
