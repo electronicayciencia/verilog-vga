@@ -1,10 +1,29 @@
-// Provides basic services to interact with the text hardware
+/*
+This is the abstraction layer to interact with the text hardware.
+
+Valid/ready handshake.
+
+Control characters:
+- 0x00 NUL: do nothing.
+- 0x08 BS:  move cursor 1 position to the right
+- 0x0A LF:  move cursor 1 position down, scroll text if needed
+- 0x0C FF:  clear the screen and home cursor
+- 0x0D CR:  move the cursor to first position in the line
+
+else: 
+- put the char in the current position
+- move cursor 1 position to the right
+- if it is at the end of the line, move it to the first position of the next line (auto margin)
+- scroll if needed
+
+*/
+
 module control (
     input        i_clk,       // 12 MHz please
-    input        i_clearhome, // pulse to do clearhome
-    input        i_putchar,   // pulse to do putchar
-    input  [7:0] i_char,      // char to put
-    output [4:0] o_LCD_R,
+    input  [7:0] i_char,      // char received
+    input        i_valid,     // new char available
+    output       o_ready,     // ready to get a char
+    output [4:0] o_LCD_R,     // LCD lines
     output [5:0] o_LCD_G,
     output [4:0] o_LCD_B,
     output       o_LCD_HSYNC,
@@ -17,24 +36,131 @@ module control (
 parameter false = 1'b0;
 parameter true = 1'b1;
 
+parameter first_col = 0;
+parameter first_row = 0;
+parameter last_col = 59;
+parameter last_row = 16;
 
-wire [4:0] row;
-wire [5:0] col;
+reg [4:0] row = last_row;
+reg [5:0] col;
+
+reg [2:0] status = IDLE;
+
+reg [7:0] char; // processing this char
+assign o_ready = status == IDLE;
 
 
-wire clearhome_start = i_clearhome;
-wire putchar_start   = i_putchar;
+// Values for vram lines when no other module is running
+reg  vram_w  = false;
+reg  vram_ce = false;
+wire [10:0] vram_addr = {row, col};
+wire  [7:0] vram_din = char;
+wire  [7:0] vram_dout;
 
-wire scroll_start = putchar_scroll_start;
-wire scroll_running;
 
-reg clear_start = false;
-wire clear_running;
+/*
+Ready / valid handshake
+*/
+
+
+
+/* 
+Main controller.
+This block interprets control characters.
+*/
+localparam NUL = 8'h00, // do nothing.
+           BS  = 8'h08, // move cursor 1 position to the right
+           LF  = 8'h0A, // move cursor 1 position down, scroll text if needed
+           FF  = 8'h0C, // clear the screen and home cursor
+           CR  = 8'h0D; // move the cursor to first position in the line
+
+
+localparam IDLE       = 3'd0,  // done
+           START      = 3'd1,  // new character
+           WRITING    = 3'd2,  // write a character in the current position
+           SCROLLING  = 3'd3,  // run the scroll module
+           CLEARING   = 3'd4;  // run the clear module
+
+reg scroll_start = 0; // to order a scroll
+
+always @(posedge i_clk) begin
+    if (status == IDLE) begin
+        if (i_valid) begin
+            char <= i_char;
+            status <= START; // this de-asserts ready signal
+        end
+    end
+
+    case (char)
+        NUL:
+            status <= IDLE;
+            
+        BS: begin
+            if (status == START) begin
+                if (col != first_col)
+                    col <= col - 1'b1;
+                status <= IDLE;
+            end
+        end
+
+        // default is write character in teletype mode with auto-margin
+        default:  begin
+            case (status)
+                START: begin
+                    vram_w <= true;
+                    vram_ce <= true;
+                    status <= WRITING;
+                end
+                WRITING: begin
+                    vram_w <= false;
+                    vram_ce <= false;
+                    if (col == last_col) begin
+                        col <= first_col;
+                        row <= row == last_row ? row : row + 1'b1;
+                    end
+                    else begin
+                        col <= col + 1'b1;
+                    end
+                    if (row == last_row & col == last_col) begin
+                        status <= SCROLLING;
+                        scroll_start <= true;
+                    end
+                    else begin
+                        status <= IDLE;
+                    end
+                end
+                SCROLLING: begin
+                    scroll_start <= false;
+                    if (scroll_running)
+                        status <= SCROLLING;
+                    else
+                        status <= IDLE;
+                end
+            endcase
+        end
+
+    endcase
+
+end
+
+
+
+
+
+//wire clearhome_start = i_clearhome;
+//wire putchar_start   = i_putchar;
+
+//wire scroll_start = putchar_scroll_start;
+//wire scroll_running;
+
+//reg clear_start = false;
+//wire clear_running;
 
 
 /********************************/
 /* Put character and advance cursor
 /********************************/
+/*
 wire position_last_col, position_last_row;
 wire cursor_end = position_last_col & position_last_row;
 wire [7:0] putchar_vram_din;
@@ -57,11 +183,14 @@ putchar putchar (
     .o_vram_ce   (putchar_vram_ce),
     .o_vram_din  (putchar_vram_din)
 );
+*/
+
 
 
 /********************************/
 /* Clear the screen and home cursor
 /********************************/
+/*
 reg clearhome_running = false;
 reg clearhome_cursorhome = false; // to indicate homing the cursor
 
@@ -82,8 +211,8 @@ always @(posedge i_clk) begin
         clearhome_cursorhome <= false;
     end
 end
-
-
+*/
+/*
 position position(
     .i_clk         (i_clk),
     .i_cmd_home    (clearhome_cursorhome),
@@ -93,43 +222,60 @@ position position(
     .o_row         (row),
     .o_col         (col)
 );
+*/
 
 
-
-/********************************/
-/* Modules and control
-/********************************/
-
-// Default values for vram lines
-wire vram_w  = false;
-wire vram_ce = false;
-wire [10:0] vram_addr = {row, col};
-wire  [7:0] vram_din = false;
-
+/************************************/
+/* Primitives and VRAM lines sharing
+/************************************/
 
 // VRAM lines are shared between all modules
-wire        common_vram_w,
-            scroll_vram_w,
+reg         common_vram_w;
+reg         common_vram_ce;
+reg  [10:0] common_vram_addr;
+reg   [7:0] common_vram_din;
+
+wire        scroll_vram_w,
             clear_vram_w;
 
-wire        common_vram_ce,
-            scroll_vram_ce, 
+wire        scroll_vram_ce, 
             clear_vram_ce;
 
-wire [10:0] common_vram_addr, 
-            scroll_vram_addr, 
+wire [10:0] scroll_vram_addr, 
             clear_vram_addr;
 
-wire  [7:0] common_vram_dout, 
-            scroll_vram_dout, 
-            clear_vram_dout;
-
-wire  [7:0] common_vram_din, 
-            scroll_vram_din, 
+wire  [7:0] scroll_vram_din, 
             clear_vram_din;
 
 
-// When a module is active, it takes the VRAM wires over idle signals
+// When a module is active, it is assigned the VRAM wires
+always @(*) begin
+    case(status)
+        CLEARING: begin
+            common_vram_w    <= clear_vram_w;
+            common_vram_ce   <= clear_vram_ce;
+            common_vram_addr <= clear_vram_addr;
+            common_vram_din  <= clear_vram_din;
+        end
+
+        SCROLLING: begin
+            common_vram_w    <= scroll_vram_w;
+            common_vram_ce   <= scroll_vram_ce;
+            common_vram_addr <= scroll_vram_addr;
+            common_vram_din  <= scroll_vram_din;
+        end
+
+        default: begin
+            common_vram_w    <= vram_w;
+            common_vram_ce   <= vram_ce;
+            common_vram_addr <= vram_addr;
+            common_vram_din  <= vram_din;
+        end
+
+    endcase
+end
+
+/*
 assign common_vram_w    = scroll_running  ? scroll_vram_w : 
                           clear_running   ? clear_vram_w : 
                           putchar_running ? putchar_vram_w : 
@@ -148,9 +294,7 @@ assign common_vram_din  = scroll_running  ? scroll_vram_din :
                           clear_running   ? clear_vram_din : 
                           putchar_running ? putchar_vram_din : 
                           vram_din;
-
-assign scroll_vram_dout = scroll_running ? common_vram_dout : false;
-
+*/
 
 scroll scroll_m(
     .i_clk          (i_clk),
@@ -159,7 +303,7 @@ scroll scroll_m(
     .o_vram_addr    (scroll_vram_addr),
     .o_vram_w       (scroll_vram_w),
     .o_vram_ce      (scroll_vram_ce),
-    .i_vram_dout    (scroll_vram_dout),
+    .i_vram_dout    (vram_dout),
     .o_vram_din     (scroll_vram_din)
 );
 
@@ -185,7 +329,7 @@ text text(
     .i_vram_clk     (i_clk),         // VRAM clock
     .i_vram_addr    (common_vram_addr),  // VRAM address {5'y, 6'x}
     .i_vram_din     (common_vram_din),   // VRAM data in
-    .i_vram_dout    (common_vram_dout),  // VRAM data out
+    .o_vram_dout    (vram_dout),         // VRAM data out
     .i_vram_ce      (common_vram_ce),    // VRAM clock enable
     .i_vram_wre     (common_vram_w),     // VRAM write / read
 

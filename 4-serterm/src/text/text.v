@@ -7,7 +7,7 @@ module text (
     // VRAM port: for upper controller
     input [10:0]    i_vram_addr,    // VRAM address {5'y, 6'x}
     input  [7:0]    i_vram_din,     // VRAM data in
-    output [7:0]    i_vram_dout,    // VRAM data out
+    output [7:0]    o_vram_dout,    // VRAM data out
     input           i_vram_clk,     // VRAM clock
     input           i_vram_ce,      // VRAM clock enable
     input           i_vram_wre,     // VRAM write/read
@@ -97,7 +97,7 @@ vram_m64x32 vram(
     // A port: for upper controller
     .ada       (i_vram_addr),  //input [10:0] A address
     .dina      (i_vram_din),   //input  [7:0] A data in
-    .douta     (i_vram_dout),  //output [7:0] A data out
+    .douta     (o_vram_dout),  //output [7:0] A data out
     .wrea      (i_vram_wre),   //input A write/read
     .clka      (i_vram_clk),   //input clock for A port 
     .cea       (i_vram_ce),    //input clock enable for A

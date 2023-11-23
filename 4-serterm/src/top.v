@@ -55,8 +55,6 @@ push_button m_BTN_B (
 );
 */
 
-reg putchar_start = 0;
-
 
 /**************************/
 /* UART for PC
@@ -64,7 +62,7 @@ reg putchar_start = 0;
 
 wire [7:0] uart_rx_axis_tdata;
 wire uart_rx_axis_tvalid;
-reg uart_rx_axis_tready = true;
+wire uart_rx_axis_tready;
 
 wire [7:0] uart_tx_axis_tdata;
 wire uart_tx_axis_tvalid;
@@ -99,9 +97,9 @@ uart_pc (
 
 control control (
     .i_clk       (CLK_12MHZ),
-    .i_clearhome (clearhome_start), // pulse to do clearhome
-    .i_putchar   (putchar_start),   // pulse to do putchar
-    .i_char      (uart_rx_axis_tdata),             // char to put
+    .i_valid     (uart_rx_axis_tvalid),
+    .i_char      (uart_rx_axis_tdata),   // char to put
+    .o_ready     (uart_rx_axis_tready),
     .o_LCD_R     (LCD_R),
     .o_LCD_G     (LCD_G),
     .o_LCD_B     (LCD_B),
@@ -111,7 +109,7 @@ control control (
     .o_LCD_DEN   (LCD_DEN)
 );
 
-
+/*
 always @(posedge CLK_12MHZ) begin
     // putchar has no "running" signal
     // assume it has enough time between one byte and the next
@@ -128,7 +126,7 @@ always @(posedge CLK_12MHZ) begin
         putchar_start <= true;
     end
 end
-
+*/
 
 /*****************/
 /* CH9350 keyboard
