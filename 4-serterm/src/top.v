@@ -26,12 +26,12 @@ module top (
 localparam false = 1'b0;
 localparam true = 1'b1;
 
-localparam char = 8'h41;
+// We do not transmit data to the keyb.
+assign TXD_KEYB = 1'bZ;
 
-
-wire CLK_12MHZ;
 
 // Use 24/2 = 12MHz for LCD and system clock.
+wire CLK_12MHZ;
 clk_div clk_div (
     .i_clk(XTAL_IN),
     .i_factor(5'd0),     // 0: /2,  1: /4,  2: /8 ...
@@ -69,8 +69,6 @@ reg uart_rx_axis_tready = true;
 wire [7:0] uart_tx_axis_tdata;
 wire uart_tx_axis_tvalid;
 wire uart_tx_axis_tready;
-
-
 
 uart
 uart_pc (
@@ -133,14 +131,14 @@ end
 
 
 /*****************/
-/* Test keyboard
+/* CH9350 keyboard
 /*****************/
-keyb_tests keyb_tests (
+CH9350_keyboard keyboard (
     .i_clk        (CLK_12MHZ),
     .i_rxd        (RXD_KEYB),
     .i_data_ready (uart_tx_axis_tready),
     .o_data_valid (uart_tx_axis_tvalid),
-    .o_data       (uart_tx_axis_tdata)  // mapped key
+    .o_data       (uart_tx_axis_tdata)  // mapped key goes directly to the PC
 );
 
 

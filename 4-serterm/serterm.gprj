@@ -11,8 +11,8 @@
         <File path="src/control/position.v" type="file.verilog" enable="1"/>
         <File path="src/control/putchar.v" type="file.verilog" enable="1"/>
         <File path="src/control/scroll.v" type="file.verilog" enable="1"/>
+        <File path="src/keyb/keyboard.v" type="file.verilog" enable="1"/>
         <File path="src/keyb/keymap.v" type="file.verilog" enable="1"/>
-        <File path="src/keyb/tests.v" type="file.verilog" enable="1"/>
         <File path="src/keyb/usbkeys.v" type="file.verilog" enable="1"/>
         <File path="src/misc/push_button.v" type="file.verilog" enable="1"/>
         <File path="src/text/cursor.v" type="file.verilog" enable="1"/>
@@ -26,7 +26,6 @@
         <File path="src/text/vsync.v" type="file.verilog" enable="1"/>
         <File path="src/top.v" type="file.verilog" enable="1"/>
         <File path="src/uart/uart.v" type="file.verilog" enable="1"/>
-        <File path="src/uart/uart_example.v" type="file.verilog" enable="0"/>
         <File path="src/uart/uart_rx.v" type="file.verilog" enable="1"/>
         <File path="src/uart/uart_tx.v" type="file.verilog" enable="1"/>
         <File path="src/lcd.cst" type="file.cst" enable="1"/>
