@@ -42,7 +42,7 @@ parameter last_col = 59;
 parameter last_row = 16;
 
 reg [4:0] row = last_row;
-reg [5:0] col;
+reg [5:0] col = 5;
 
 reg [2:0] status = IDLE;
 
@@ -58,55 +58,108 @@ wire  [7:0] vram_din = char;
 wire  [7:0] vram_dout;
 
 
-/*
-Ready / valid handshake
-*/
-
-
 
 /* 
 Main controller.
 This block interprets control characters.
 */
 localparam NUL = 8'h00, // do nothing.
-           BS  = 8'h08, // move cursor 1 position to the right
-           LF  = 8'h0A, // move cursor 1 position down, scroll text if needed
-           FF  = 8'h0C, // clear the screen and home cursor
-           CR  = 8'h0D; // move the cursor to first position in the line
+           BS  = 8'h08, // ^H move cursor 1 position to the right
+           DEL = 8'h7F, // move cursor 1 position to the right
+           LF  = 8'h0A, // ^J move cursor 1 position down, scroll text if needed
+           FF  = 8'h0C, // ^L clear the screen and home cursor
+           CR  = 8'h0D; // ^M move the cursor to first position in the line
 
 
 localparam IDLE       = 3'd0,  // done
-           START      = 3'd1,  // new character
+           NEW        = 3'd1,  // new character
            WRITING    = 3'd2,  // write a character in the current position
            SCROLLING  = 3'd3,  // run the scroll module
            CLEARING   = 3'd4;  // run the clear module
 
 reg scroll_start = 0; // to order a scroll
+reg clear_start  = 0; // to order a clearing
 
 always @(posedge i_clk) begin
     if (status == IDLE) begin
         if (i_valid) begin
             char <= i_char;
-            status <= START; // this de-asserts ready signal
+            status <= NEW; // this de-asserts the ready signal
         end
     end
 
     case (char)
-        NUL:
-            status <= IDLE;
-            
-        BS: begin
-            if (status == START) begin
+        NUL: begin
+            if (status == NEW) begin
+                status <= IDLE;
+            end
+        end
+
+        BS, 
+        DEL: begin
+            if (status == NEW) begin
                 if (col != first_col)
                     col <= col - 1'b1;
                 status <= IDLE;
             end
         end
 
+
+        CR: begin
+            if (status == NEW) begin
+                col <= first_col;
+                status <= IDLE;
+            end
+        end
+
+
+        LF: begin
+            case (status)
+            NEW: begin
+                if (row == last_row) begin
+                    status <= SCROLLING;
+                    scroll_start <= true;
+                end
+                else begin
+                    row <= row + 1'b1;
+                    status <= IDLE;
+                end
+            end
+            
+            SCROLLING: begin
+                scroll_start <= false;
+                if (scroll_running)
+                    status <= SCROLLING;
+                else
+                    status <= IDLE;
+            end
+            endcase
+        end
+
+
+        FF: begin
+            case (status)
+                NEW: begin
+                    row <= first_row;
+                    col <= first_col;
+                    clear_start <= true;
+                    status <= CLEARING;
+                end
+                CLEARING: begin
+                    clear_start <= false;
+                    if (clear_running)
+                        status <= CLEARING;
+                    else
+                        status <= IDLE;
+                end
+            endcase
+        end
+
+
         // default is write character in teletype mode with auto-margin
         default:  begin
             case (status)
-                START: begin
+                NEW: begin
                     vram_w <= true;
                     vram_ce <= true;
                     status <= WRITING;
@@ -146,83 +199,6 @@ end
 
 
 
-
-//wire clearhome_start = i_clearhome;
-//wire putchar_start   = i_putchar;
-
-//wire scroll_start = putchar_scroll_start;
-//wire scroll_running;
-
-//reg clear_start = false;
-//wire clear_running;
-
-
-/********************************/
-/* Put character and advance cursor
-/********************************/
-/*
-wire position_last_col, position_last_row;
-wire cursor_end = position_last_col & position_last_row;
-wire [7:0] putchar_vram_din;
-wire putchar_running,
-     putchar_vram_ce,
-     putchar_vram_w,
-     putchar_cursor_advance,
-     putchar_scroll_start,
-     putchar_need_scroll;
-
-putchar putchar (
-    .i_clk       (i_clk),
-    .i_start     (i_putchar),             // assert high to set the char
-    .i_cursorend (cursor_end),
-    .i_char      (i_char),
-    .o_advance   (putchar_cursor_advance), // inform position module to update cursor
-    .o_scroll    (putchar_scroll_start),   // inform scroll module to scroll up
-    .o_running   (putchar_running),        // take vram lines
-    .o_vram_w    (putchar_vram_w),
-    .o_vram_ce   (putchar_vram_ce),
-    .o_vram_din  (putchar_vram_din)
-);
-*/
-
-
-
-/********************************/
-/* Clear the screen and home cursor
-/********************************/
-/*
-reg clearhome_running = false;
-reg clearhome_cursorhome = false; // to indicate homing the cursor
-
-always @(posedge i_clk) begin
-    if (clearhome_start) begin
-        clearhome_running <= true;
-        clear_start <= true;
-    end
-    
-    if (clearhome_running) begin
-        if (clear_running) begin
-            clear_start <= false;
-            clearhome_running <= false;
-            clearhome_cursorhome <= true;
-        end
-    end
-    else begin
-        clearhome_cursorhome <= false;
-    end
-end
-*/
-/*
-position position(
-    .i_clk         (i_clk),
-    .i_cmd_home    (clearhome_cursorhome),
-    .i_cmd_advance (putchar_cursor_advance),
-    .o_last_row    (position_last_row),
-    .o_last_col    (position_last_col),
-    .o_row         (row),
-    .o_col         (col)
-);
-*/
 
 
 /************************************/
@@ -275,26 +251,6 @@ always @(*) begin
     endcase
 end
 
-/*
-assign common_vram_w    = scroll_running  ? scroll_vram_w : 
-                          clear_running   ? clear_vram_w : 
-                          putchar_running ? putchar_vram_w : 
-                          vram_w;
-
-assign common_vram_ce   = scroll_running  ? scroll_vram_ce : 
-                          clear_running   ? clear_vram_ce : 
-                          putchar_running ? putchar_vram_ce : 
-                          vram_ce;
-
-assign common_vram_addr = scroll_running  ? scroll_vram_addr :
-                          clear_running   ? clear_vram_addr : 
-                          vram_addr;
-
-assign common_vram_din  = scroll_running  ? scroll_vram_din :
-                          clear_running   ? clear_vram_din : 
-                          putchar_running ? putchar_vram_din : 
-                          vram_din;
-*/
 
 scroll scroll_m(
     .i_clk          (i_clk),
