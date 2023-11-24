@@ -38,22 +38,6 @@ clk_div clk_div (
     .o_clk(CLK_12MHZ)
 );
 
-/*
-push_button m_BTN_A (
-    .i_btn   (~BTN_A),         // button active high
-    .i_delay (0_200_000),      // [31:0] ticks to wait for repeat
-    .i_clk   (CLK_12MHZ),
-    .o_pulse (rst)   // output is high for 1 tick
-);
-
-
-push_button m_BTN_B (
-    .i_btn   (~BTN_B),         // button active high
-    .i_delay (2_000_000),      // [31:0] ticks to wait for repeat
-    .i_clk   (CLK_12MHZ),
-    .o_pulse (clearhome_start) // output is high for 1 tick
-);
-*/
 
 
 /**************************/
@@ -109,24 +93,6 @@ control control (
     .o_LCD_DEN   (LCD_DEN)
 );
 
-/*
-always @(posedge CLK_12MHZ) begin
-    // putchar has no "running" signal
-    // assume it has enough time between one byte and the next
-    // then, ready to receive another byte
-    if (putchar_start) begin
-        putchar_start <= false;
-        uart_rx_axis_tready <= false;
-    end
-
-    // got one, clear ready signal
-    // and put it into the screen
-    else if (uart_rx_axis_tvalid) begin
-        uart_rx_axis_tready <= true;
-        putchar_start <= true;
-    end
-end
-*/
 
 /*****************/
 /* CH9350 keyboard

@@ -41,8 +41,8 @@ parameter first_row = 0;
 parameter last_col = 59;
 parameter last_row = 16;
 
-reg [4:0] row = last_row;
-reg [5:0] col = 5;
+reg [4:0] row = first_row;
+reg [5:0] col = first_col;
 
 reg [2:0] status = IDLE;
 
@@ -64,6 +64,7 @@ Main controller.
 This block interprets control characters.
 */
 localparam NUL = 8'h00, // do nothing.
+           BEL = 8'h07, // do nothing
            BS  = 8'h08, // ^H move cursor 1 position to the right
            DEL = 8'h7F, // move cursor 1 position to the right
            LF  = 8'h0A, // ^J move cursor 1 position down, scroll text if needed
@@ -89,7 +90,8 @@ always @(posedge i_clk) begin
     end
 
     case (char)
-        NUL: begin
+        NUL,
+        BEL: begin
             if (status == NEW) begin
                 status <= IDLE;
             end
@@ -195,8 +197,6 @@ always @(posedge i_clk) begin
     endcase
 
 end
-
-
 
 
 

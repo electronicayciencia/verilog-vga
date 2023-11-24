@@ -29,23 +29,50 @@ wire meta  = |( (i_mod & LMETA)  | (i_mod & RMETA)  );
 always @(i_byte, ctrl, shift, alt, meta) begin
     if (ctrl) begin
         case(i_byte)
-            8'h00: o_byte <= 0;
+            8'h00: o_byte <= 8'h00; // ^@ NUL
+            8'h04: o_byte <= 8'h01; // ^A SOH
+            8'h05: o_byte <= 8'h02; // ^B STX
+            8'h06: o_byte <= 8'h03; // ^C ETX
+            8'h07: o_byte <= 8'h04; // ^D EOT
+            8'h08: o_byte <= 8'h05; // ^E ENQ
+            8'h09: o_byte <= 8'h06; // ^F ACK
+            8'h0a: o_byte <= 8'h07; // ^G BEL
+            8'h0b: o_byte <= 8'h08; // ^H BS
+            8'h0c: o_byte <= 8'h09; // ^I HT
+            8'h0d: o_byte <= 8'h0A; // ^J LF
+            8'h0e: o_byte <= 8'h0B; // ^K VT
+            8'h0f: o_byte <= 8'h0C; // ^L FF
+            8'h10: o_byte <= 8'h0D; // ^M CR
+            8'h11: o_byte <= 8'h0E; // ^N SO
+            8'h12: o_byte <= 8'h0F; // ^O SI
+            8'h13: o_byte <= 8'h10; // ^P DLE
+            8'h14: o_byte <= 8'h11; // ^Q DC1
+            8'h15: o_byte <= 8'h12; // ^R DC2
+            8'h16: o_byte <= 8'h13; // ^S DC3
+            8'h17: o_byte <= 8'h14; // ^T DC4
+            8'h18: o_byte <= 8'h15; // ^U NAK
+            8'h19: o_byte <= 8'h16; // ^V SYN
+            8'h1a: o_byte <= 8'h17; // ^W ETB
+            8'h1b: o_byte <= 8'h18; // ^X CAN
+            8'h1c: o_byte <= 8'h19; // ^Y EM
+            8'h1d: o_byte <= 8'h1A; // ^Z SUB
             default: o_byte <= i_byte;
         endcase
     end
     else if (alt) begin
         case(i_byte)
             8'h00: o_byte <= 0;
-            default: o_byte <= i_byte;
-        endcase
-    end
-    else if (meta) begin
-        case(i_byte)
-            8'h00: o_byte <= 0;
             8'h1e: o_byte <= "|";  // Number 1
             8'h1f: o_byte <= "@";  // Number 2
             8'h20: o_byte <= "#";  // Number 3
             8'h21: o_byte <= "~";  // Number 4
+            8'h35: o_byte <= "\\";
+            default: o_byte <= i_byte;
+        endcase
+    end
+    // meta is the windows key
+    else if (meta) begin
+        case(i_byte)
             default: o_byte <= i_byte;
         endcase
     end
@@ -90,7 +117,7 @@ always @(i_byte, ctrl, shift, alt, meta) begin
             8'h26: o_byte <= ")";  // Number 9
             8'h27: o_byte <= "=";  // Number 0
 
-            8'h2d: o_byte <= "_";
+            8'h38: o_byte <= "_";
             8'h36: o_byte <= ";";
             8'h37: o_byte <= ":";
 
@@ -138,13 +165,17 @@ always @(i_byte, ctrl, shift, alt, meta) begin
             8'h26: o_byte <= "9"; // Number 9
             8'h27: o_byte <= "0"; // Number 0
  
-            8'h28: o_byte <= 8'h0D; // Return (ENTER)
-            8'h2a: o_byte <= 8'h08; // Backspace (not DEL)
+            8'h28: o_byte <= 8'h0D; // Return
+            8'h58: o_byte <= 8'h0A; // Enter
+
+            8'h2a: o_byte <= 8'h08; // Backspace
+            8'h4c: o_byte <= 8'h1F; // Delete
+
             8'h2b: o_byte <= 8'h09; // Tab
             8'h2c: o_byte <= " ";   // Spacebar
-            8'h2d: o_byte <= "-";
             8'h36: o_byte <= ",";
             8'h37: o_byte <= ".";
+            8'h38: o_byte <= "-";
 
             default: o_byte <= i_byte;
         endcase
