@@ -21,5 +21,3 @@
 -write_mode_1 normal
 -speed false
 -reset_mode sync
--init_file D:\Documentos\GitHub\verilog-vga\4-serterm\src\text\vram\64x32_quijote_850.mi
--init_match port_A
