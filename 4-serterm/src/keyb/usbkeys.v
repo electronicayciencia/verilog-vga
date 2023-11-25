@@ -34,7 +34,8 @@ localparam
     CODE  = 2'd3; // next is the key scan code
 
 reg [1:0] status = LOOK;
-reg [3:0] idx   = 0;
+reg [3:0] idx    = 0;
+reg pressed      = 0;
 
 wire [7:0] first = magic[8*(LEN-1) +: 8]; 
 wire [7:0] next  = magic[8*(LEN-idx-1) +: 8];
@@ -80,10 +81,16 @@ always @(posedge i_clk) begin
         CODE:
             begin
                 status <= LOOK;
-                if (char) begin // do nothing for char = 0 (key release)
-                    o_byte_ready <= 0; // halt data flow until our scan code is received
-                    o_key_valid <= 1;
-                    o_key <= char;  // <-- translate lookup table here
+                if (char) begin // char = 0 (key release)
+                    if (!pressed) begin  // TODO
+                        o_byte_ready <= 0; // halt data flow until our scan code is received
+                        o_key_valid <= 1;
+                        o_key <= char;  // <-- translate lookup table here
+                        pressed <= 1;
+                    end
+                end
+                else begin
+                    pressed <= 0;
                 end
             end
         endcase

@@ -117,9 +117,13 @@ always @(i_byte, ctrl, shift, alt, meta) begin
             8'h26: o_byte <= ")";  // Number 9
             8'h27: o_byte <= "=";  // Number 0
 
+            8'h2d: o_byte <= "?";
+            8'h30: o_byte <= "*";
+
             8'h38: o_byte <= "_";
             8'h36: o_byte <= ";";
             8'h37: o_byte <= ":";
+            8'h64: o_byte <= ">";
 
             default: o_byte <= i_byte;
         endcase
@@ -166,13 +170,16 @@ always @(i_byte, ctrl, shift, alt, meta) begin
             8'h27: o_byte <= "0"; // Number 0
  
             8'h28: o_byte <= 8'h0D; // Return
+            8'h2d: o_byte <= "'";
             8'h58: o_byte <= 8'h0A; // Enter
+            8'h64: o_byte <= "<";
 
             8'h2a: o_byte <= 8'h08; // Backspace
-            8'h4c: o_byte <= 8'h1F; // Delete
+            8'h4c: o_byte <= 8'h7F; // Delete
 
             8'h2b: o_byte <= 8'h09; // Tab
             8'h2c: o_byte <= " ";   // Spacebar
+            8'h30: o_byte <= "+";
             8'h36: o_byte <= ",";
             8'h37: o_byte <= ".";
             8'h38: o_byte <= "-";
