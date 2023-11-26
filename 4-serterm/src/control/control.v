@@ -4,11 +4,13 @@ This is the abstraction layer to interact with the text hardware.
 Valid/ready handshake.
 
 Control characters:
-- 0x00 NUL: do nothing.
-- 0x08 BS:  move cursor 1 position to the right
-- 0x0A LF:  move cursor 1 position down, scroll text if needed
-- 0x0C FF:  clear the screen and home cursor
-- 0x0D CR:  move the cursor to first position in the line
+    NUL = 8'h00, // do nothing.
+    BEL = 8'h07, // do nothing
+    BS  = 8'h08, // ^H move cursor 1 position to the right
+    DEL = 8'h7F, // ^? move cursor 1 position to the right
+    LF  = 8'h0A, // ^J move cursor 1 position down, scroll text if needed
+    FF  = 8'h0C, // ^L clear the screen and home cursor
+    CR  = 8'h0D; // ^M move the cursor to first position in the line
 
 else: 
 - put the char in the current position
@@ -47,7 +49,9 @@ reg [5:0] col = first_col;
 reg [2:0] status = IDLE;
 
 reg [7:0] char; // processing this char
-assign o_ready = status == IDLE;
+assign o_ready = (status == IDLE) | 
+                 (status == WAIT_COL) |
+                 (status == WAIT_ROW) ;
 
 
 // Values for vram lines when no other module is running
@@ -57,6 +61,8 @@ wire [10:0] vram_addr = {row, col};
 wire  [7:0] vram_din = char;
 wire  [7:0] vram_dout;
 
+// add 20h to row/col number to prevent control codes
+wire [7:0] i_char_nocontrol = i_char - 8'h20;
 
 
 /* 
@@ -69,133 +75,160 @@ localparam NUL = 8'h00, // do nothing.
            DEL = 8'h7F, // move cursor 1 position to the right
            LF  = 8'h0A, // ^J move cursor 1 position down, scroll text if needed
            FF  = 8'h0C, // ^L clear the screen and home cursor
-           CR  = 8'h0D; // ^M move the cursor to first position in the line
-
+           CR  = 8'h0D, // ^M move the cursor to first position in the line
+           DC4 = 8'h14; // ^T position the cursor at row / col
 
 localparam IDLE       = 3'd0,  // done
            NEW        = 3'd1,  // new character
            WRITING    = 3'd2,  // write a character in the current position
            SCROLLING  = 3'd3,  // run the scroll module
-           CLEARING   = 3'd4;  // run the clear module
+           CLEARING   = 3'd4,  // run the clear module
+           WAIT_ROW   = 3'd5,  // ^T received, waiting for row
+           WAIT_COL   = 3'd6;  // ^T received, waiting for col
 
 reg scroll_start = 0; // to order a scroll
 reg clear_start  = 0; // to order a clearing
 
 always @(posedge i_clk) begin
-    if (status == IDLE) begin
-        if (i_valid) begin
-            char <= i_char;
-            status <= NEW; // this de-asserts the ready signal
-        end
-    end
+    case(status)
 
-    case (char)
-        NUL,
-        BEL: begin
-            if (status == NEW) begin
+        IDLE: begin
+            if (i_valid) begin
+                char <= i_char;
+                status <= NEW; // this de-asserts the ready signal
+            end
+        end
+
+        WAIT_ROW: begin
+            if (i_valid) begin
+                row <= i_char_nocontrol[4:0]; 
+                status <= WAIT_COL;
+            end
+        end
+
+        WAIT_COL: begin
+            if (i_valid) begin
+                col <= i_char_nocontrol[5:0]; // add 20h to prevent control codes
                 status <= IDLE;
             end
         end
 
-        BS, 
-        DEL: begin
-            if (status == NEW) begin
-                if (col != first_col)
-                    col <= col - 1'b1;
-                status <= IDLE;
-            end
-        end
-
-
-        CR: begin
-            if (status == NEW) begin
-                col <= first_col;
-                status <= IDLE;
-            end
-        end
-
-
-        LF: begin
-            case (status)
-            NEW: begin
-                if (row == last_row) begin
-                    status <= SCROLLING;
-                    scroll_start <= true;
-                end
-                else begin
-                    row <= row + 1'b1;
-                    status <= IDLE;
-                end
-            end
-            
-            SCROLLING: begin
-                scroll_start <= false;
-                if (scroll_running)
-                    status <= SCROLLING;
-                else
-                    status <= IDLE;
-            end
-            endcase
-        end
-
-
-        FF: begin
-            case (status)
-                NEW: begin
-                    row <= first_row;
-                    col <= first_col;
-                    clear_start <= true;
-                    status <= CLEARING;
-                end
-                CLEARING: begin
-                    clear_start <= false;
-                    if (clear_running)
-                        status <= CLEARING;
-                    else
+        default: begin
+            case (char)
+                NUL,
+                BEL: begin
+                    if (status == NEW) begin
                         status <= IDLE;
+                    end
                 end
-            endcase
-        end
+
+                BS, 
+                DEL: begin
+                    if (status == NEW) begin
+                        if (col != first_col)
+                            col <= col - 1'b1;
+                        status <= IDLE;
+                    end
+                end
 
 
-        // default is write character in teletype mode with auto-margin
-        default:  begin
-            case (status)
-                NEW: begin
-                    vram_w <= true;
-                    vram_ce <= true;
-                    status <= WRITING;
-                end
-                WRITING: begin
-                    vram_w <= false;
-                    vram_ce <= false;
-                    if (col == last_col) begin
+                CR: begin
+                    if (status == NEW) begin
                         col <= first_col;
-                        row <= row == last_row ? row : row + 1'b1;
-                    end
-                    else begin
-                        col <= col + 1'b1;
-                    end
-                    if (row == last_row & col == last_col) begin
-                        status <= SCROLLING;
-                        scroll_start <= true;
-                    end
-                    else begin
                         status <= IDLE;
                     end
                 end
-                SCROLLING: begin
-                    scroll_start <= false;
-                    if (scroll_running)
-                        status <= SCROLLING;
-                    else
-                        status <= IDLE;
+
+
+                DC4: begin
+                    if (status == NEW) begin
+                        status <= WAIT_ROW;
+                    end
                 end
+
+
+                LF: begin
+                    case (status)
+                    NEW: begin
+                        if (row == last_row) begin
+                            status <= SCROLLING;
+                            scroll_start <= true;
+                        end
+                        else begin
+                            row <= row + 1'b1;
+                            status <= IDLE;
+                        end
+                    end
+                    
+                    SCROLLING: begin
+                        scroll_start <= false;
+                        if (scroll_running)
+                            status <= SCROLLING;
+                        else
+                            status <= IDLE;
+                    end
+                    endcase
+                end
+
+
+                FF: begin
+                    case (status)
+                        NEW: begin
+                            row <= first_row;
+                            col <= first_col;
+                            clear_start <= true;
+                            status <= CLEARING;
+                        end
+                        CLEARING: begin
+                            clear_start <= false;
+                            if (clear_running)
+                                status <= CLEARING;
+                            else
+                                status <= IDLE;
+                        end
+                    endcase
+                end
+
+
+                // default is write character in teletype mode with auto-margin
+                default:  begin
+                    case (status)
+                        NEW: begin
+                            vram_w <= true;
+                            vram_ce <= true;
+                            status <= WRITING;
+                        end
+                        WRITING: begin
+                            vram_w <= false;
+                            vram_ce <= false;
+                            if (col == last_col) begin
+                                col <= first_col;
+                                row <= row == last_row ? row : row + 1'b1;
+                            end
+                            else begin
+                                col <= col + 1'b1;
+                            end
+                            if (row == last_row & col == last_col) begin
+                                status <= SCROLLING;
+                                scroll_start <= true;
+                            end
+                            else begin
+                                status <= IDLE;
+                            end
+                        end
+                        SCROLLING: begin
+                            scroll_start <= false;
+                            if (scroll_running)
+                                status <= SCROLLING;
+                            else
+                                status <= IDLE;
+                        end
+                    endcase
+                end
+
             endcase
         end
-
     endcase
-
 end
 
 

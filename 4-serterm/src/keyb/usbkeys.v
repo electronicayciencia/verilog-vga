@@ -82,10 +82,10 @@ always @(posedge i_clk) begin
             begin
                 status <= LOOK;
                 if (char) begin // char = 0 (key release)
-                    if (!pressed) begin  // TODO
+                    if (!pressed) begin
                         o_byte_ready <= 0; // halt data flow until our scan code is received
                         o_key_valid <= 1;
-                        o_key <= char;  // <-- translate lookup table here
+                        o_key <= char;     // <-- translate lookup table here
                         pressed <= 1;
                     end
                 end
