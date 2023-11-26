@@ -63,7 +63,7 @@ wire  [7:0] vram_dout;
 
 // add 20h to row/col number to prevent control codes
 wire [7:0] i_char_nocontrol = i_char - 8'h20;
-
+wire [7:0] next_tab = (col + 6'b001000) & 6'b111000;
 
 /* 
 Main controller.
@@ -72,6 +72,7 @@ This block interprets control characters.
 localparam NUL = 8'h00, // do nothing.
            BEL = 8'h07, // do nothing
            BS  = 8'h08, // ^H move cursor 1 position to the right
+           HT  = 8'h09, // Tab move cursor col to the next multiple of 8
            DEL = 8'h7F, // move cursor 1 position to the right
            LF  = 8'h0A, // ^J move cursor 1 position down, scroll text if needed
            FF  = 8'h0C, // ^L clear the screen and home cursor
@@ -135,6 +136,15 @@ always @(posedge i_clk) begin
                 CR: begin
                     if (status == NEW) begin
                         col <= first_col;
+                        status <= IDLE;
+                    end
+                end
+
+
+                HT: begin
+                    if (status == NEW) begin
+                        if (col <= last_col - 8)
+                            col <= next_tab[5:0];
                         status <= IDLE;
                     end
                 end
