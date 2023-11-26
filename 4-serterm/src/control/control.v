@@ -102,15 +102,21 @@ always @(posedge i_clk) begin
 
         WAIT_ROW: begin
             if (i_valid) begin
-                row <= i_char_nocontrol[4:0]; 
                 status <= WAIT_COL;
+                if (i_char_nocontrol[4:0] <= last_row)
+                    row <= i_char_nocontrol[4:0]; 
+                else
+                    row <= last_row;
             end
         end
 
         WAIT_COL: begin
             if (i_valid) begin
-                col <= i_char_nocontrol[5:0]; // add 20h to prevent control codes
                 status <= IDLE;
+                if (i_char_nocontrol[5:0] <= last_col)
+                    col <= i_char_nocontrol[5:0];
+                else
+                    col <= last_col;
             end
         end
 
