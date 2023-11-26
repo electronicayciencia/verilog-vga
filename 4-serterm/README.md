@@ -22,7 +22,7 @@ This is the `eyc.inf` terminfo file:
       cup=^T%p1%' '%+%c%p2%' '%+%c,cub1=^H,
       home=^T  ,
       it#8,ht=^I,
-
+      acsc=l\332m\300k\277j\331q\304x\263u\264t\303n\305v\301w\302O\333a\261o\337s\334,
 
 Compile it with:
 
