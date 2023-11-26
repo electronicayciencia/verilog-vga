@@ -1,0 +1,23 @@
+-series GW1N
+-device GW1N-1
+-package QFN48
+-part_number GW1N-LV1QN48C6/I5
+
+
+-mod_name vram_m64x32
+-file_name vram_m64x32
+-path D:/Documentos/GitHub/verilog-vga/4-serterm/src/text/vram/
+-type RAM_DP
+-file_type vlg
+-bram_b true
+-dev_type GW1N-1
+-depth_0 2048
+-depth_1 2048
+-width_0 8
+-width_1 8
+-read_mode_0 bypass
+-read_mode_1 bypass
+-write_mode_0 write-through
+-write_mode_1 normal
+-speed false
+-reset_mode sync

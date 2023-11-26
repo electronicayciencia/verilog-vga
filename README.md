@@ -42,3 +42,16 @@ Main post (spanish):
 
 - [Gráficos VGA con FPGA Tang Nano parte III. Texto](https://www.electronicayciencia.com/2023/11/lcd_tang_nano_III_texto.html)
 
+
+## Part IV: Serial terminal
+
+Using the text controller to make a serial terminal.
+
+Repository:
+
+- [4. Serial Terminal](4-serterm)
+
+Main post (spanish):
+
+- Work in Progress
+
