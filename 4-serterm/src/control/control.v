@@ -63,7 +63,8 @@ wire  [7:0] vram_dout;
 
 // add 20h to row/col number to prevent control codes
 wire [7:0] i_char_nocontrol = i_char - 8'h20;
-wire [7:0] next_tab = (col + 6'b001000) & 6'b111000;
+// tabs each 4 spaces
+wire [7:0] next_tab = (col + 6'b000100) & 6'b111100;
 
 /* 
 Main controller.
@@ -149,8 +150,7 @@ always @(posedge i_clk) begin
 
                 HT: begin
                     if (status == NEW) begin
-                        if (col <= last_col - 8)
-                            col <= next_tab[5:0];
+                        col <= (next_tab[5:0] <= last_col) ? next_tab[5:0] : col;
                         status <= IDLE;
                     end
                 end
