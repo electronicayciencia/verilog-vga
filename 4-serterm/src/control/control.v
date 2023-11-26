@@ -150,7 +150,7 @@ always @(posedge i_clk) begin
 
                 HT: begin
                     if (status == NEW) begin
-                        col <= (next_tab[5:0] <= last_col) ? next_tab[5:0] : col;
+                        col <= (next_tab[5:0] <= last_col) ? next_tab[5:0] : last_col;
                         status <= IDLE;
                     end
                 end
