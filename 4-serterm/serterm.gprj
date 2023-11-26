@@ -28,6 +28,7 @@
         <File path="src/uart/uart_tx.v" type="file.verilog" enable="1"/>
         <File path="src/lcd.cst" type="file.cst" enable="1"/>
         <File path="src/serterm.sdc" type="file.sdc" enable="1"/>
+        <File path="README.md" type="file.other" enable="1"/>
         <File path="src/control/README.md" type="file.other" enable="1"/>
         <File path="src/keyb/README.md" type="file.other" enable="1"/>
         <File path="src/misc/README.md" type="file.other" enable="1"/>
