@@ -63,8 +63,8 @@ wire  [7:0] vram_dout;
 
 // add 20h to row/col number to prevent control codes
 wire [7:0] i_char_nocontrol = i_char - 8'h20;
-// tabs each 4 spaces
-wire [7:0] next_tab = (col + 6'b000100) & 6'b111100;
+// tabs each 8 spaces
+wire [7:0] next_tab = (col + 6'b001000) & 6'b111000;
 
 /* 
 Main controller.
