@@ -74,9 +74,11 @@ uart_pc (
     .rx_frame_error(),
     // configuration
     // prescale = 12_000_000/(1200*8)
-    .prescale(16'd1250) // 1200
+    //.prescale(16'd1250) // 1200
     //.prescale(16'd2000) // 750
     //.prescale(16'd156)  // 9600
+    //.prescale(16'd39)   // 38400
+    .prescale(16'd13)     // 115200
 );
 
 
