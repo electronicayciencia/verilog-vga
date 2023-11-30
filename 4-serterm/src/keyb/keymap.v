@@ -199,6 +199,12 @@ always @(i_byte, ctrl, shift, alt, meta, i_nullify) begin
             8'h37: o_byte <= ".";
             8'h38: o_byte <= "-";
 
+            // map arrow keys for Bash
+            8'h4F: o_byte <= 8'h06; // right ^F
+            8'h50: o_byte <= 8'h02; // left  ^B
+            8'h51: o_byte <= 8'h0E; // down  ^N
+            8'h52: o_byte <= 8'h10; // top   ^P
+
             default: o_byte <= i_nullify ? 8'b0 : i_byte;
         endcase
     end
