@@ -1,5 +1,5 @@
 module top (
-    input XTAL_IN,       // 24 MHz
+    input XTAL_IN, // 24 MHz
 
     output [4:0] LCD_R,
     output [5:0] LCD_G,
@@ -9,11 +9,13 @@ module top (
     output LCD_CLK,
     output LCD_DEN,
 
+    input  BTN_A, // If BTN_A is pressed, the original HID USB scan code
+                  // is sent for unmapped keys instead of null.
+
 //    output LED_R,
 //    output LED_G,
 //    output LED_B,
 
-//    input  BTN_A,
 //    input  BTN_B,
 
     input  RXD_PC,
@@ -103,6 +105,7 @@ control control (
 /*****************/
 CH9350_keyboard keyboard (
     .i_clk        (CLK_12MHZ),
+    .i_nullify    (BTN_A),
     .i_rxd        (RXD_KEYB),
     .i_data_ready (uart_tx_axis_tready),
     .o_data_valid (uart_tx_axis_tvalid),

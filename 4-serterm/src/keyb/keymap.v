@@ -3,12 +3,15 @@ Map USB HID scan code to characters
 1 key -> 1 character 
 Escape character keys are not supported 
 Spanish layout
-If the key is not mapped, return the original USB HID scan code.
+If the key is not mapped can:
+ - i_nullify = true : return null
+ - i_nullify = false : return the original USB HID scan code.
 */
 module keymap (
-    input      [7:0] i_byte, // input byte
-    input      [7:0] i_mod,  // modifier
-    output reg [7:0] o_byte  // output
+    input      [7:0] i_byte,    // input byte
+    input      [7:0] i_mod,     // modifier
+    input            i_nullify, // return null if the key is not mapped
+    output reg [7:0] o_byte     // output
 );
 
 localparam LCTRL  = 8'h01;
@@ -26,7 +29,7 @@ wire alt   = |( (i_mod & LALT)   | (i_mod & RALT)   );
 wire meta  = |( (i_mod & LMETA)  | (i_mod & RMETA)  );
 
 
-always @(i_byte, ctrl, shift, alt, meta) begin
+always @(i_byte, ctrl, shift, alt, meta, i_nullify) begin
     if (ctrl) begin
         case(i_byte)
             8'h00: o_byte <= 8'h00; // ^@ NUL
@@ -56,7 +59,7 @@ always @(i_byte, ctrl, shift, alt, meta) begin
             8'h1b: o_byte <= 8'h18; // ^X CAN
             8'h1c: o_byte <= 8'h19; // ^Y EM
             8'h1d: o_byte <= 8'h1A; // ^Z SUB
-            default: o_byte <= i_byte;
+            default: o_byte <= i_nullify ? 8'b0 : i_byte;
         endcase
     end
     else if (alt) begin
@@ -71,13 +74,13 @@ always @(i_byte, ctrl, shift, alt, meta) begin
             8'h32: o_byte <= "}";  // key ç Ç }
             8'h34: o_byte <= "{";  // key ´ ¨ {
             8'h35: o_byte <= "\\";
-            default: o_byte <= i_byte;
+            default: o_byte <= i_nullify ? 8'b0 : i_byte;
         endcase
     end
     // meta is the windows key
     else if (meta) begin
         case(i_byte)
-            default: o_byte <= i_byte;
+            default: o_byte <= i_nullify ? 8'b0 : i_byte;
         endcase
     end
     else if (shift) begin
@@ -132,7 +135,7 @@ always @(i_byte, ctrl, shift, alt, meta) begin
             8'h37: o_byte <= ":";
             8'h64: o_byte <= ">";
 
-            default: o_byte <= i_byte;
+            default: o_byte <= i_nullify ? 8'b0 : i_byte;
         endcase
     end
     else begin
@@ -196,7 +199,7 @@ always @(i_byte, ctrl, shift, alt, meta) begin
             8'h37: o_byte <= ".";
             8'h38: o_byte <= "-";
 
-            default: o_byte <= i_byte;
+            default: o_byte <= i_nullify ? 8'b0 : i_byte;
         endcase
     end
 end

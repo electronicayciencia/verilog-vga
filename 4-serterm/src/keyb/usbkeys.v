@@ -1,6 +1,7 @@
-// Translate USB bytes to UART keys
+// Translate USB byte sequences to UART keys
 module usbkeys (
     input            i_clk,
+    input            i_nullify,
     // get a byte stream
     input      [7:0] i_byte,
     input            i_byte_valid,
@@ -16,9 +17,10 @@ wire [7:0] char;
 reg  [7:0] mask = 0;
 
 keymap keymap (
-    .i_byte (i_byte), // input byte
-    .i_mod  (mask),   // modifier
-    .o_byte (char)    // output
+    .i_byte    (i_byte),    // input byte
+    .i_mod     (mask),      // modifier
+    .i_nullify (i_nullify), // return null if the key is not mapped
+    .o_byte    (char)       // output
 );
 
 // Detect key

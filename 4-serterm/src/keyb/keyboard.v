@@ -9,6 +9,7 @@ Then, o_data_valid is asserted until i_data_ready is high.
 */
 module CH9350_keyboard (
     input  i_clk,        // 12 MHz
+    input  i_nullify,    // return null if the key is not mapped
     input  i_rxd,        // we only receive from keyboard
     input  i_data_ready,
     output o_data_valid,
@@ -47,6 +48,7 @@ uart_rx_inst (
 // Translate USB bytes to ascii codes
 usbkeys usbkeys (
     .i_clk        (i_clk),
+    .i_nullify    (i_nullify),
     // get a byte stream
     .i_byte       (uart_rx_axis_tdata),
     .i_byte_valid (uart_rx_axis_tvalid),
