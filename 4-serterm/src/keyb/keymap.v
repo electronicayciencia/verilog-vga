@@ -32,7 +32,7 @@ wire meta  = |( (i_mod & LMETA)  | (i_mod & RMETA)  );
 always @(i_byte, ctrl, shift, alt, meta, i_nullify) begin
     if (ctrl) begin
         case(i_byte)
-            8'h00: o_byte <= 8'h00; // ^@ NUL
+            8'h1f: o_byte <= 8'b00; // Ctrl+3 ^@
             8'h04: o_byte <= 8'h01; // ^A SOH
             8'h05: o_byte <= 8'h02; // ^B STX
             8'h06: o_byte <= 8'h03; // ^C ETX
@@ -59,6 +59,14 @@ always @(i_byte, ctrl, shift, alt, meta, i_nullify) begin
             8'h1b: o_byte <= 8'h18; // ^X CAN
             8'h1c: o_byte <= 8'h19; // ^Y EM
             8'h1d: o_byte <= 8'h1A; // ^Z SUB
+
+            8'h20: o_byte <= 8'h1B; // Ctrl+3 ^[
+            8'h21: o_byte <= 8'h1C; // Ctrl+4 ^\
+            8'h22: o_byte <= 8'h1D; // Ctrl+5 ^]
+            8'h23: o_byte <= 8'h1E; // Ctrl+6 ^^
+            8'h24: o_byte <= 8'h1F; // Ctrl+7 ^_
+            8'h25: o_byte <= 8'h7F; // Ctrl+8 ^?
+
             default: o_byte <= i_nullify ? 8'b0 : i_byte;
         endcase
     end
