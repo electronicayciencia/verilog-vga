@@ -13,19 +13,20 @@
         <File path="src/keyb/keymap.v" type="file.verilog" enable="1"/>
         <File path="src/keyb/usbkeys.v" type="file.verilog" enable="1"/>
         <File path="src/misc/push_button.v" type="file.verilog" enable="0"/>
-        <File path="src/text/cursor.v" type="file.verilog" enable="1"/>
+        <File path="src/text/cursor.v" type="file.verilog" enable="0"/>
         <File path="src/text/delaybit_2tic.v" type="file.verilog" enable="1"/>
         <File path="src/text/delayvector3_1tic.v" type="file.verilog" enable="1"/>
         <File path="src/text/delayvector4_1tic.v" type="file.verilog" enable="1"/>
         <File path="src/text/hsync.v" type="file.verilog" enable="1"/>
         <File path="src/text/rom_font_1bit_8x16/rom_font_1bit_8x16.v" type="file.verilog" enable="1"/>
         <File path="src/text/text.v" type="file.verilog" enable="1"/>
-        <File path="src/text/vram/vram_m64x32.v" type="file.verilog" enable="1"/>
         <File path="src/text/vsync.v" type="file.verilog" enable="1"/>
         <File path="src/top.v" type="file.verilog" enable="1"/>
         <File path="src/uart/uart.v" type="file.verilog" enable="1"/>
         <File path="src/uart/uart_rx.v" type="file.verilog" enable="1"/>
         <File path="src/uart/uart_tx.v" type="file.verilog" enable="1"/>
+        <File path="src/video/video.v" type="file.verilog" enable="1"/>
+        <File path="src/video/vram/vram_m64x32.v" type="file.verilog" enable="1"/>
         <File path="src/lcd.cst" type="file.cst" enable="1"/>
         <File path="src/serterm.sdc" type="file.sdc" enable="1"/>
         <File path="README.md" type="file.other" enable="1"/>
@@ -34,5 +35,6 @@
         <File path="src/misc/README.md" type="file.other" enable="1"/>
         <File path="src/text/README.md" type="file.other" enable="1"/>
         <File path="src/uart/README.md" type="file.other" enable="1"/>
+        <File path="src/video/README.md" type="file.other" enable="1"/>
     </FileList>
 </Project>
