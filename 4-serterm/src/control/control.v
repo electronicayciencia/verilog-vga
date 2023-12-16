@@ -62,10 +62,10 @@ reg vram_w  = false;
 reg vram_ce = false;
 
 assign o_vram_clk  = i_clk;
-assign o_vram_wre  = vram_w;
-assign o_vram_ce   = vram_ce;
-assign o_vram_addr = {row, col};
-assign o_vram_din  = char;
+assign o_vram_wre  = common_vram_w;
+assign o_vram_ce   = common_vram_ce;
+assign o_vram_addr = common_vram_addr;
+assign o_vram_din  = common_vram_din;
 
 // add 20h to row/col number to prevent control codes
 wire [7:0] i_char_nocontrol = i_char - 8'h20;
@@ -299,8 +299,8 @@ always @(*) begin
         default: begin
             common_vram_w    <= vram_w;
             common_vram_ce   <= vram_ce;
-            common_vram_addr <= o_vram_addr;
-            common_vram_din  <= o_vram_din;
+            common_vram_addr <= {row, col};
+            common_vram_din  <= char;
         end
 
     endcase
