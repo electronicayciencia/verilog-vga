@@ -22,6 +22,7 @@ else:
 */
 module control (
     input         i_clk,       // 12 MHz please
+    input         i_ectlchrs,  // enable control characters
 
     // Interface
     input   [7:0] i_char,      // char received
@@ -128,16 +129,16 @@ always @(posedge i_clk) begin
         end
 
         default: begin
-            case (char)
-                NUL,
-                BEL: begin
+            case ({i_ectlchrs, char})
+                {true, NUL},
+                {true, BEL}: begin
                     if (status == NEW) begin
                         status <= IDLE;
                     end
                 end
 
-                BS, 
-                DEL: begin
+                {true, BS}, 
+                {true, DEL}: begin
                     if (status == NEW) begin
                         if (col != first_col)
                             col <= col - 1'b1;
@@ -146,7 +147,7 @@ always @(posedge i_clk) begin
                 end
 
 
-                CR: begin
+                {true, CR}: begin
                     if (status == NEW) begin
                         col <= first_col;
                         status <= IDLE;
@@ -154,7 +155,7 @@ always @(posedge i_clk) begin
                 end
 
 
-                HT: begin
+                {true, HT}: begin
                     if (status == NEW) begin
                         col <= (next_tab[5:0] <= last_col) ? next_tab[5:0] : last_col;
                         status <= IDLE;
@@ -162,14 +163,14 @@ always @(posedge i_clk) begin
                 end
 
 
-                DC4: begin
+                {true, DC4}: begin
                     if (status == NEW) begin
                         status <= WAIT_ROW;
                     end
                 end
 
 
-                LF: begin
+                {true, LF}: begin
                     case (status)
                     NEW: begin
                         if (row == last_row) begin
@@ -193,7 +194,7 @@ always @(posedge i_clk) begin
                 end
 
 
-                FF: begin
+                {true, FF}: begin
                     case (status)
                         NEW: begin
                             row <= first_row;
