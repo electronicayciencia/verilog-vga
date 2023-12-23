@@ -5,7 +5,7 @@ module bel (
     output o_bel     // active high
 );
 
-localparam maxtime = 600000; // 12e6 * 0.05
+localparam maxtime = 300000; // 12e6 * 0.05
 
 reg [24:0] ctr;
 assign o_bel = |ctr;
