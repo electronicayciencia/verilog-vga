@@ -23,6 +23,7 @@ else:
 */
 module control (
     input         i_clk,       // 12 MHz please
+    input         i_ectlchrs,  // enable control characters
 
     // Interface
     input   [7:0] i_char,      // char received
@@ -66,10 +67,10 @@ reg vram_w  = false;
 reg vram_ce = false;
 
 assign o_vram_clk  = i_clk;
-assign o_vram_wre  = vram_w;
-assign o_vram_ce   = vram_ce;
-assign o_vram_addr = {row, col};
-assign o_vram_din  = char;
+assign o_vram_wre  = common_vram_w;
+assign o_vram_ce   = common_vram_ce;
+assign o_vram_addr = common_vram_addr;
+assign o_vram_din  = common_vram_din;
 
 // add 20h to row/col number to prevent control codes
 wire [7:0] i_char_nocontrol = i_char - 8'h20;
@@ -134,14 +135,14 @@ always @(posedge i_clk) begin
         end
 
         default: begin
-            case (char)
-                NUL: begin
+            case ({i_ectlchrs, char})
+                {true, NUL}: begin
                     if (status == NEW) begin
                         status <= IDLE;
                     end
                 end
 
-                BEL: begin
+                {true, BEL}: begin
                     if (status == NEW) begin
                         bel_start <= true;
                         status <= RINGING;
@@ -152,8 +153,8 @@ always @(posedge i_clk) begin
                     end
                 end
 
-                BS, 
-                DEL: begin
+                {true, BS}, 
+                {true, DEL}: begin
                     if (status == NEW) begin
                         if (col != first_col)
                             col <= col - 1'b1;
@@ -162,7 +163,7 @@ always @(posedge i_clk) begin
                 end
 
 
-                CR: begin
+                {true, CR}: begin
                     if (status == NEW) begin
                         col <= first_col;
                         status <= IDLE;
@@ -170,7 +171,7 @@ always @(posedge i_clk) begin
                 end
 
 
-                HT: begin
+                {true, HT}: begin
                     if (status == NEW) begin
                         col <= (next_tab[5:0] <= last_col) ? next_tab[5:0] : last_col;
                         status <= IDLE;
@@ -178,14 +179,14 @@ always @(posedge i_clk) begin
                 end
 
 
-                DC4: begin
+                {true, DC4}: begin
                     if (status == NEW) begin
                         status <= WAIT_ROW;
                     end
                 end
 
 
-                LF: begin
+                {true, LF}: begin
                     case (status)
                     NEW: begin
                         if (row == last_row) begin
@@ -209,7 +210,7 @@ always @(posedge i_clk) begin
                 end
 
 
-                FF: begin
+                {true, FF}: begin
                     case (status)
                         NEW: begin
                             row <= first_row;
@@ -315,8 +316,8 @@ always @(*) begin
         default: begin
             common_vram_w    <= vram_w;
             common_vram_ce   <= vram_ce;
-            common_vram_addr <= o_vram_addr;
-            common_vram_din  <= o_vram_din;
+            common_vram_addr <= {row, col};
+            common_vram_din  <= char;
         end
 
     endcase

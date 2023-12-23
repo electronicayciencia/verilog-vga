@@ -11,12 +11,12 @@ module top (
 
     input  BTN_A, // If BTN_A is pressed, the original HID USB scan code
                   // is sent for unmapped keys instead of null.
+    input  BTN_B, // If BTN_B is pressed, the original ASCII gliph is printed for
+                  // control characters.
 
 //    output LED_R,
 //    output LED_G,
 //    output LED_B,
-
-//    input  BTN_B,
 
     input  RXD_PC,
     output TXD_PC,
@@ -124,6 +124,7 @@ video video (
 /**************************/
 control control (
     .i_clk       (CLK_12MHZ),
+    .i_ectlchrs  (BTN_B),     // enable control characters
 
     // Interface
     .i_valid     (uart_rx_axis_tvalid),
