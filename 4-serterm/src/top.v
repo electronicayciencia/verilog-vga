@@ -94,9 +94,11 @@ wire  [7:0] vram_dout; // VRAM data out
 wire        vram_clk;  // VRAM clock
 wire        vram_ce;   // VRAM clock enable
 wire        vram_wre;  // VRAM write/read
+wire        bel;       // Bell ringing
 
 video video (
     .i_clk (CLK_12MHZ),                    // Clock (12 MHz)
+    .i_reversev  (bel),                    // Reverse video
 
     // VRAM port for the controller
     .i_vram_addr (vram_addr),    // VRAM address {5'y, 6'x}
@@ -134,7 +136,10 @@ control control (
     .i_vram_dout (vram_dout), // VRAM data out
     .o_vram_clk  (vram_clk),  // VRAM clock
     .o_vram_ce   (vram_ce),   // VRAM clock enable
-    .o_vram_wre  (vram_wre)   // VRAM write/read
+    .o_vram_wre  (vram_wre),  // VRAM write/read
+
+    // signal to other modules
+    .o_bel       (bel)        // Bell active
 );
 
 

@@ -3,15 +3,16 @@ This is the abstraction layer to interact with the text hardware.
 
 Valid/ready handshake.
 
-Some control characters:
-    NUL = 8'h00, // do nothing.
-    BEL = 8'h07, // do nothing
-    BS  = 8'h08, // ^H move cursor 1 position to the right
-    DEL = 8'h7F, // ^? move cursor 1 position to the right
-    LF  = 8'h0A, // ^J move cursor 1 position down, scroll text if needed
-    FF  = 8'h0C, // ^L clear the screen and home cursor
-    CR  = 8'h0D; // ^M move the cursor to first position in the line
-    DC4 = 8'h14; // ^T position the cursor at row / col
+Control characters:
+      NUL = 8'h00, // ^@ do nothing.
+      BEL = 8'h07, // ^G generate bel signal
+      BS  = 8'h08, // ^H move cursor 1 position to the right
+      HT  = 8'h09, // ^I Tab move cursor col to the next multiple of 8
+      DEL = 8'h7F, // ^? move cursor 1 position to the right
+      LF  = 8'h0A, // ^J move cursor 1 position down, scroll text if needed
+      FF  = 8'h0C, // ^L clear the screen and home cursor
+      CR  = 8'h0D, // ^M move the cursor to first position in the line
+      DC4 = 8'h14; // ^T position the cursor at row / col
 
 else: 
 - put the char in the current position
@@ -34,7 +35,10 @@ module control (
     input   [7:0] i_vram_dout, // VRAM data out
     output        o_vram_clk,  // VRAM clock
     output        o_vram_ce,   // VRAM clock enable
-    output        o_vram_wre   // VRAM write/read
+    output        o_vram_wre,  // VRAM write/read
+
+    // signal to other modules
+    output        o_bel        // Bell active
 );
 
 
@@ -76,11 +80,11 @@ wire [7:0] next_tab = (col + 6'b001000) & 6'b111000;
 Main controller.
 This block interprets control characters.
 */
-localparam NUL = 8'h00, // do nothing.
-           BEL = 8'h07, // do nothing
+localparam NUL = 8'h00, // ^@ do nothing.
+           BEL = 8'h07, // ^G generate bel signal
            BS  = 8'h08, // ^H move cursor 1 position to the right
-           HT  = 8'h09, // Tab move cursor col to the next multiple of 8
-           DEL = 8'h7F, // move cursor 1 position to the right
+           HT  = 8'h09, // ^I Tab move cursor col to the next multiple of 8
+           DEL = 8'h7F, // ^? move cursor 1 position to the right
            LF  = 8'h0A, // ^J move cursor 1 position down, scroll text if needed
            FF  = 8'h0C, // ^L clear the screen and home cursor
            CR  = 8'h0D, // ^M move the cursor to first position in the line
@@ -92,10 +96,12 @@ localparam IDLE       = 3'd0,  // done
            SCROLLING  = 3'd3,  // run the scroll module
            CLEARING   = 3'd4,  // run the clear module
            WAIT_ROW   = 3'd5,  // ^T received, waiting for row
-           WAIT_COL   = 3'd6;  // ^T received, waiting for col
+           WAIT_COL   = 3'd6,  // ^T received, waiting for col
+           RINGING    = 3'd7;  // ^G received, ringing the bel
 
 reg scroll_start = 0; // to order a scroll
 reg clear_start  = 0; // to order a clearing
+reg bel_start    = 0; // to ring the bell
 
 always @(posedge i_clk) begin
     case(status)
@@ -129,9 +135,19 @@ always @(posedge i_clk) begin
 
         default: begin
             case (char)
-                NUL,
+                NUL: begin
+                    if (status == NEW) begin
+                        status <= IDLE;
+                    end
+                end
+
                 BEL: begin
                     if (status == NEW) begin
+                        bel_start <= true;
+                        status <= RINGING;
+                    end
+                    else begin
+                        bel_start <= false;
                         status <= IDLE;
                     end
                 end
@@ -329,5 +345,11 @@ clear clear_m(
     .o_vram_din     (clear_vram_din)
 );
 
+
+bel bel (
+    .i_clk          (i_clk),
+    .i_start        (bel_start),
+    .o_bel          (o_bel)
+);
 
 endmodule

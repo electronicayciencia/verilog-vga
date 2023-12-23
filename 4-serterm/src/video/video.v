@@ -2,6 +2,7 @@
 // Also exposes the VRAM port A for the controller part.
 module video (
     input i_clk,                    // Clock (12 MHz)
+    input i_reversev,               // Reverse video, for bel signal
 
     // VRAM port for the controller
     input [10:0]    i_vram_addr,    // VRAM address {5'y, 6'x}
@@ -108,8 +109,17 @@ delaybit_2tic delay_cur(
     .out  (cur_on_delayed)
 );
 
-// Cursor signal xor with current caracter
-wire pxon = chr_on ^ cur_on_delayed; // pixel is ON/OFF
+/*************************************
+/*  Visual bel
+/*************************************/
+/* Latch the bel signal for the whole screen refresh to prevent artifacts. */
+reg reversev = false;
+always @(negedge o_LCD_VSYNC)
+    reversev <= i_reversev;
+
+// Cursor signal xor with current caracter, same with bel
+wire pxon = chr_on ^ cur_on_delayed ^ reversev; // pixel is ON/OFF
+
 
 
 /*************************************
