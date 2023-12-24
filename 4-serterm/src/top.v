@@ -15,8 +15,8 @@ module top (
                   // control characters.
 
 //    output LED_R,
-//    output LED_G,
-//    output LED_B,
+    output LED_G,
+    output LED_B,
 
     input  RXD_PC,
     output TXD_PC,
@@ -41,6 +41,29 @@ clk_div clk_div (
     .i_clk(XTAL_IN),
     .i_factor(5'd0),     // 0: /2,  1: /4,  2: /8 ...
     .o_clk(CLK_12MHZ)
+);
+
+
+/**************************/
+/* Buttons to configure
+/**************************/
+wire nullify;
+wire ectlchrs;
+
+assign LED_G = nullify,
+       LED_B = ectlchrs;
+
+
+toggle_button t_btn_a(
+    .i_clk(CLK_12MHZ),
+    .i_btn(BTN_A),
+    .o_sw(nullify)
+);
+
+toggle_button t_btn_b (
+    .i_clk(CLK_12MHZ),
+    .i_btn(BTN_B),
+    .o_sw(ectlchrs)
 );
 
 
@@ -124,7 +147,7 @@ video video (
 /**************************/
 control control (
     .i_clk       (CLK_12MHZ),
-    .i_ectlchrs  (BTN_B),     // enable control characters
+    .i_ectlchrs  (ectlchrs),  // enable control characters
 
     // Interface
     .i_valid     (uart_rx_axis_tvalid),
@@ -150,7 +173,7 @@ control control (
 /**************************/
 CH9350_keyboard keyboard (
     .i_clk        (CLK_12MHZ),
-    .i_nullify    (BTN_A),
+    .i_nullify    (nullify),
     .i_rxd        (RXD_KEYB),
     .i_data_ready (uart_tx_axis_tready),
     .o_data_valid (uart_tx_axis_tvalid),
