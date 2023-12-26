@@ -25,17 +25,19 @@ module top (
     output TXD_KEYB
 );
 
-localparam false = 1'b0;
-localparam true = 1'b1;
+`include "config.v"
+
+localparam false    = 1'b0;
+localparam true     = 1'b1;
 
 // We do not transmit data to the keyb.
 assign TXD_KEYB = 1'bZ;
-
 
 /**************************/
 /* System Clock
 /**************************/
 // Use 24/2 = 12MHz for LCD and system clock.
+parameter SYSCLK = 12_000_000;
 wire CLK_12MHZ;
 clk_div clk_div (
     .i_clk(XTAL_IN),
@@ -78,6 +80,8 @@ wire [7:0] uart_tx_axis_tdata;
 wire uart_tx_axis_tvalid;
 wire uart_tx_axis_tready;
 
+localparam prescale = SYSCLK/(baudrate*8);
+
 uart
 uart_pc (
     .clk(CLK_12MHZ),
@@ -99,12 +103,8 @@ uart_pc (
     .rx_overrun_error(),
     .rx_frame_error(),
     // configuration
-    // prescale = 12_000_000/(1200*8)
-    //.prescale(16'd1250) // 1200
-    //.prescale(16'd2000) // 750
-    //.prescale(16'd156)  // 9600
-    //.prescale(16'd39)   // 38400
-    .prescale(16'd13)     // 115200
+    .prescale(prescale[15:0])
+
 );
 
 /**************************/
@@ -120,8 +120,8 @@ wire        vram_wre;  // VRAM write/read
 wire        bel;       // Bell ringing
 
 video video (
-    .i_clk (CLK_12MHZ),                    // Clock (12 MHz)
-    .i_reversev  (bel),                    // Reverse video
+    .i_clk       (CLK_12MHZ),    // Clock (12 MHz)
+    .i_reversev  (bel),          // Reverse video
 
     // VRAM port for the controller
     .i_vram_addr (vram_addr),    // VRAM address {5'y, 6'x}
