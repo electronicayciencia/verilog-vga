@@ -1,2 +1,2 @@
 // PC <-> Console serial speed
-parameter baudrate = 1200;
+parameter baudrate = 115200;

@@ -28,6 +28,12 @@ Compile it with:
     sudo tic -ts -v eyc.inf
 
 
+## Issues
+
+True auto-margin terminal. 
+It doesn’t allow the last position on the screen to be updated without scrolling the screen.
+
+
 ## Components
 
 UART from https://github.com/alexforencich/verilog-uart
