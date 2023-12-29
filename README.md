@@ -53,5 +53,5 @@ Repository:
 
 Main post (spanish):
 
-- Work in Progress
+- Mi propia consola serie (work in progress)
 
