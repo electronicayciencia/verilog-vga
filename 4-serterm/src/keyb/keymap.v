@@ -11,7 +11,8 @@ module keymap (
     input      [7:0] i_byte,    // input byte
     input      [7:0] i_mod,     // modifier
     input            i_nullify, // return null if the key is not mapped
-    output reg [7:0] o_byte     // output
+    output reg [7:0] o_byte,    // output
+    output           o_sysreq   // SysReq key
 );
 
 localparam LCTRL  = 8'h01;
@@ -27,7 +28,6 @@ wire ctrl  = |( (i_mod & LCTRL)  | (i_mod & RCTRL)  );
 wire shift = |( (i_mod & LSHIFT) | (i_mod & RSHIFT) );
 wire alt   = |( (i_mod & LALT)   | (i_mod & RALT)   );
 wire meta  = |( (i_mod & LMETA)  | (i_mod & RMETA)  );
-
 
 always @(i_byte, ctrl, shift, alt, meta, i_nullify) begin
     if (ctrl) begin
@@ -218,6 +218,7 @@ always @(i_byte, ctrl, shift, alt, meta, i_nullify) begin
     end
 end
 
-
+// SysReq key generates break signal in any combinarion
+assign o_sysreq = (i_byte == 8'h46); 
 
 endmodule

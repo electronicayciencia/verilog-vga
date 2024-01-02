@@ -14,6 +14,7 @@
         <File path="src/keyb/keyboard.v" type="file.verilog" enable="1"/>
         <File path="src/keyb/keymap.v" type="file.verilog" enable="1"/>
         <File path="src/keyb/usbkeys.v" type="file.verilog" enable="1"/>
+        <File path="src/misc/break.v" type="file.verilog" enable="1"/>
         <File path="src/misc/push_button.v" type="file.verilog" enable="0"/>
         <File path="src/misc/toggle_button.v" type="file.verilog" enable="1"/>
         <File path="src/text/cursor.v" type="file.verilog" enable="0"/>

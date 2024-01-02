@@ -14,9 +14,9 @@ module top (
     input  BTN_B, // If BTN_B is pressed, the original ASCII gliph is printed for
                   // control characters.
 
-//    output LED_R,
-    output LED_G,
-    output LED_B,
+    output LED_R, // Break signal being transmitted
+    output LED_G, // BTN_A active
+    output LED_B, // BTN_B active
 
     input  RXD_PC,
     output TXD_PC,
@@ -37,7 +37,6 @@ assign TXD_KEYB = 1'bZ;
 /* System Clock
 /**************************/
 // Use 24/2 = 12MHz for LCD and system clock.
-parameter SYSCLK = 12_000_000;
 wire CLK_12MHZ;
 clk_div clk_div (
     .i_clk(XTAL_IN),
@@ -53,8 +52,8 @@ wire nullify;
 wire ectlchrs;
 
 assign LED_G = nullify,
-       LED_B = ectlchrs;
-
+       LED_B = ectlchrs,
+       LED_R = ~break_signal;
 
 toggle_button t_btn_a(
     .i_clk(CLK_12MHZ),
@@ -80,6 +79,10 @@ wire [7:0] uart_tx_axis_tdata;
 wire uart_tx_axis_tvalid;
 wire uart_tx_axis_tready;
 
+wire tx_pc_data;
+wire break_signal;
+assign TXD_PC = tx_pc_data & ~(break_signal);
+
 localparam prescale = SYSCLK/(baudrate*8);
 
 uart
@@ -96,7 +99,7 @@ uart_pc (
     .m_axis_tready(uart_rx_axis_tready),
     // uart
     .rxd(RXD_PC),
-    .txd(TXD_PC),
+    .txd(tx_pc_data),
     // status
     .tx_busy(),
     .rx_busy(),
@@ -177,9 +180,18 @@ CH9350_keyboard keyboard (
     .i_rxd        (RXD_KEYB),
     .i_data_ready (uart_tx_axis_tready),
     .o_data_valid (uart_tx_axis_tvalid),
-    .o_data       (uart_tx_axis_tdata)  // mapped key goes directly to the PC
+    .o_data       (uart_tx_axis_tdata),  // mapped key goes directly to the PC
+    .o_break      (break_start)
 );
 
+/**************************/
+/* TX break signal (hold TX line down for longer than 1+8 symbols)
+/**************************/
+break break_m (
+    .i_clk      (CLK_12MHZ),
+    .i_start    (break_start),
+    .o_signal   (break_signal)
+);
 
 endmodule
 

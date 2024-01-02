@@ -9,7 +9,9 @@ module usbkeys (
     // output keys
     input            i_key_ready,
     output reg       o_key_valid,
-    output reg [7:0] o_key
+    output reg [7:0] o_key,
+    // output signals
+    output           o_break_key
 );
 
 
@@ -20,7 +22,8 @@ keymap keymap (
     .i_byte    (i_byte),    // input byte
     .i_mod     (mask),      // modifier
     .i_nullify (i_nullify), // return null if the key is not mapped
-    .o_byte    (char)       // output
+    .o_byte    (char),      // output
+    .o_sysreq  (sysreq)
 );
 
 // Detect key
@@ -98,5 +101,8 @@ always @(posedge i_clk) begin
         endcase
     end
 end
+
+assign o_break_key = sysreq & (status == CODE);
+
 
 endmodule

@@ -1,2 +1,5 @@
+// Use 24/2 = 12MHz for LCD and system clock.
+localparam SYSCLK = 12_000_000;
+
 // PC <-> Console serial speed
-parameter baudrate = 115200;
+localparam baudrate = 115200;

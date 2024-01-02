@@ -13,7 +13,8 @@ module CH9350_keyboard (
     input  i_rxd,        // we only receive from keyboard
     input  i_data_ready,
     output o_data_valid,
-    output [7:0] o_data  // mapped key
+    output [7:0] o_data, // mapped key
+    output o_break       // break signal
 );
 
 wire rst = 1'b0;
@@ -56,7 +57,9 @@ usbkeys usbkeys (
     // output keys
     .i_key_ready  (i_data_ready),
     .o_key_valid  (o_data_valid),
-    .o_key        (o_data)
+    .o_key        (o_data),
+    // output signals
+    .o_break_key  (o_break)
 );
 
 

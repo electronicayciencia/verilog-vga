@@ -61,6 +61,12 @@ esac
 - **A**: Send the original HID USB scan code for unmapped keys (default: send *null*).
 - **B**: Show ASCII gliphs for control characters (default: interpret some control characters).
 
+### LEDs
+
+- **Red**: Sending *break* signal.
+- **Green**: Button A is active.
+- **Blue**: Button B is active.
+
 ### Configuration
 
 Select serial speed editing [src/config.v]
@@ -78,6 +84,9 @@ Cursor location is also supported:
 And graphical characters, compatible with `dialog` applications:
 
 ![](https://www.electronicayciencia.com/assets/2024/01/consola-serie/img/screen_dialog.jpg)
+
+**Break** is invoked using the SysReq key.
+
 
 ### Control character table
 
@@ -113,13 +122,13 @@ And graphical characters, compatible with `dialog` applications:
 |`0x1b`| `^[` | `ESC` | 
 |`0x1c`| `^\ `| `FS`  | 
 |`0x1d`| `^]` | `GS`  | 
-|`0x1e`| `^^` | `RS`  | Used for graphics: up arrow)
-|`0x1f`| `^_` | `US`  | Used for graphics: down arrow)
+|`0x1e`| `^^` | `RS`  | (Used for graphics: up arrow)
+|`0x1f`| `^_` | `US`  | (Used for graphics: down arrow)
 |`0x7f`| `^?` | `DEL` | Move cursor back one position
 
 ## Issues
 
-This is a *true* auto-margin terminal. That means it doesn’t allow the last position on the screen to be updated without jumpint to the next line or scrolling the screen.
+This is a *true* auto-margin terminal. That means it doesn’t allow the last position on the screen to be updated without jumping to the next line or scrolling the screen.
 
 If some curses programs don't work properly, just decrease the width by one column:
 
