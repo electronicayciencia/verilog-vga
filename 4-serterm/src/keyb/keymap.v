@@ -219,6 +219,7 @@ always @(i_byte, ctrl, shift, alt, meta, i_nullify) begin
 end
 
 // SysReq key generates break signal in any combinarion
-assign o_sysreq = (i_byte == 8'h46); 
+// Pause/Break key also generate break signal
+assign o_sysreq = (i_byte == 8'h46) | (i_byte == 8'h48); 
 
 endmodule

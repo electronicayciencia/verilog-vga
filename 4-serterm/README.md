@@ -112,7 +112,7 @@ And graphical characters, compatible with `dialog` applications:
 
 ![](https://www.electronicayciencia.com/assets/2024/01/consola-serie/img/screen_dialog.jpg)
 
-**Break** is invoked using the SysReq key.
+**Break** is invoked using the SysReq key or the Pause/Break.
 
 
 ### Control character table
