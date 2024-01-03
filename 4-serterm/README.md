@@ -34,7 +34,7 @@ Main post (spanish):
 
 ### Configuration
 
-Select serial speed editing (src/config.v)[src/config.v].
+Select serial speed editing [src/config.v].
 
 
 ## Usage
