@@ -21,6 +21,21 @@ Main post (spanish):
 - [Video module](src/video/README.md)
 - [UART module](src/uart/README.md)
 
+### Buttons
+
+- **A**: Send the original HID USB scan code for unmapped keys (default: send *null*).
+- **B**: Show ASCII gliphs for control characters (default: interpret some control characters).
+
+### LEDs
+
+- **Red**: Sending *break* signal.
+- **Green**: Button A is active.
+- **Blue**: Button B is active.
+
+### Configuration
+
+Select serial speed editing (src/config.v)[src/config.v].
+
 
 ## Usage
 
@@ -56,20 +71,32 @@ case "$TERM" in
 esac
 ```
 
-### Buttons
+### Raspberry UART
 
-- **A**: Send the original HID USB scan code for unmapped keys (default: send *null*).
-- **B**: Show ASCII gliphs for control characters (default: interpret some control characters).
+In Raspberry Pi 3, the good UART is usually dedicated to Bluetooth module. And only the *miniuart* is exposed in the GPIO header. Thist *miniuart* does not support parity or break signal. It also derives its baudrate from the processor clock.
 
-### LEDs
+In order to use the full featured UART, you must disable bluetooth. To do this, add the following to `/boot/config.txt`:
 
-- **Red**: Sending *break* signal.
-- **Green**: Button A is active.
-- **Blue**: Button B is active.
+```
+dtoverlay=disable-bt
+enable_uart=1
+```
 
-### Configuration
+You can also force to use the *miniuart* for the bluetooth module. But this is not recomended:
 
-Select serial speed editing [src/config.v]
+```
+dtoverlay=miniuart-bt
+```
+
+
+### Break key
+
+In order to use SAK as a Secure Access Key, add this to the boot sequence:
+
+```
+setserial /dev/ttyAMA0 sak
+```
+
 
 ## Terminal capabilities
 
@@ -125,6 +152,7 @@ And graphical characters, compatible with `dialog` applications:
 |`0x1e`| `^^` | `RS`  | (Used for graphics: up arrow)
 |`0x1f`| `^_` | `US`  | (Used for graphics: down arrow)
 |`0x7f`| `^?` | `DEL` | Move cursor back one position
+
 
 ## Issues
 
