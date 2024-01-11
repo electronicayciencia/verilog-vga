@@ -36,6 +36,7 @@ Main post (spanish):
 
 Select serial speed editing [src/config.v].
 
+It should work fine until 38400 bauds. For 115200 you may need some padding.
 
 ## Usage
 
@@ -47,7 +48,7 @@ This is the terminal description file (`eyc.inf`):
       am,
       cols#60,
       lines#17,
-      cr=^M, cud1=^J, clear=^L, bel=^G,
+      cr=^M, cud1=^J, clear=^L, bel=^G, ind=^J
       cup=^T%p1%' '%+%c%p2%' '%+%c, cub1=^H,
       home=^T  ,
       it#8,ht=^I,

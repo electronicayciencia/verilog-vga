@@ -2,4 +2,4 @@
 localparam SYSCLK = 12_000_000;
 
 // PC <-> Console serial speed
-localparam baudrate = 115200;
+localparam baudrate = 38400;
