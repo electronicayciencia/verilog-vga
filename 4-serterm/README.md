@@ -120,41 +120,41 @@ And graphical characters, compatible with `dialog` applications:
 
 ### Control character table
 
-|Code  |Caret | Name  | Cap   |Action
-|:----:|:----:|:-----:|:-----:|------------------------
-|`0x00`| `^@` | `NUL` |       | Do nothing (padding)
-|`0x01`| `^A` | `SOH` |       | 
-|`0x02`| `^B` | `STX` |       | 
-|`0x03`| `^C` | `ETX` |       | 
-|`0x04`| `^D` | `EOT` |       | 
-|`0x05`| `^E` | `ENQ` |       | 
-|`0x06`| `^F` | `ACK` |       | 
-|`0x07`| `^G` | `BEL` | Bel   | Flash the screen (visual bell)
-|`0x08`| `^H` | `BS`  | cub1  | Move cursor one position to the left
-|`0x09`| `^I` | `HT`  | ht    | Move cursor to the next multiple-of-8 position
-|`0x0a`| `^J` | `LF`  | cud1  | Move cursor one position down. Scroll if this is the last line
-|`0x0b`| `^K` | `VT`  |       | 
-|`0x0c`| `^L` | `FF`  | clear | Clear the screen and home cursor
-|`0x0d`| `^M` | `CR`  | cr    | Move cursor to first column, same line
-|`0x0e`| `^N` | `SO`  |       | 
-|`0x0f`| `^O` | `SI`  |       | 
-|`0x10`| `^P` | `DLE` |       | (Used for graphics: right arrow)
-|`0x11`| `^Q` | `DC1` |       | (Used for graphics: left arrow)
-|`0x12`| `^R` | `DC2` | cuu1  | Move cursor one position up
-|`0x13`| `^S` | `DC3` | cuf1  | Move cursor one position to the right
-|`0x14`| `^T` | `DC4` | cup   | Move cursor to #1,#2. See terminfo file
-|`0x15`| `^U` | `NAK` |       | 
-|`0x16`| `^V` | `SYN` |       | 
-|`0x17`| `^W` | `ETB` |       | 
-|`0x18`| `^X` | `CAN` |       | 
-|`0x19`| `^Y` | `EM`  |       | 
-|`0x1a`| `^Z` | `SUB` |       | 
-|`0x1b`| `^[` | `ESC` |       | 
-|`0x1c`| `^\ `| `FS`  |       | 
-|`0x1d`| `^]` | `GS`  |       | 
-|`0x1e`| `^^` | `RS`  |       | (Used for graphics: up arrow)
-|`0x1f`| `^_` | `US`  |       | (Used for graphics: down arrow)
-|`0x7f`| `^?` | `DEL` | cub1  | Move cursor back one position
+| Code |Caret | Name  | Cap       | Action
+|:----:|:----:|:-----:|:---------:|------------------------
+|`0x00`| `^@` | `NUL` |           | Do nothing (padding)
+|`0x01`| `^A` | `SOH` |           |
+|`0x02`| `^B` | `STX` |           |
+|`0x03`| `^C` | `ETX` |           |
+|`0x04`| `^D` | `EOT` |           |
+|`0x05`| `^E` | `ENQ` |           |
+|`0x06`| `^F` | `ACK` |           |
+|`0x07`| `^G` | `BEL` | *`bel`*   | Flash the screen (visual bell)
+|`0x08`| `^H` | `BS`  | *`cub1`*  | Move cursor one position to the left
+|`0x09`| `^I` | `HT`  | *`ht`*    | Move cursor to the next multiple-of-8 position
+|`0x0a`| `^J` | `LF`  | *`cud1`*  | Move cursor one position down. Scroll if this is the last line
+|`0x0b`| `^K` | `VT`  |           |
+|`0x0c`| `^L` | `FF`  | *`clear`* | Clear the screen and home cursor
+|`0x0d`| `^M` | `CR`  | *`cr`*    | Move cursor to first column, same line
+|`0x0e`| `^N` | `SO`  |           |
+|`0x0f`| `^O` | `SI`  |           |
+|`0x10`| `^P` | `DLE` | *`acsc`*  | (Used for graphics: right arrow)
+|`0x11`| `^Q` | `DC1` | *`acsc`*  | (Used for graphics: left arrow)
+|`0x12`| `^R` | `DC2` | *`cuu1`*  | Move cursor one position up
+|`0x13`| `^S` | `DC3` | *`cuf1`*  | Move cursor one position to the right
+|`0x14`| `^T` | `DC4` | *`cup`*   | Move cursor to #1,#2. See terminfo file
+|`0x15`| `^U` | `NAK` |           |
+|`0x16`| `^V` | `SYN` |           |
+|`0x17`| `^W` | `ETB` |           |
+|`0x18`| `^X` | `CAN` |           |
+|`0x19`| `^Y` | `EM`  |           |
+|`0x1a`| `^Z` | `SUB` |           |
+|`0x1b`| `^[` | `ESC` |           |
+|`0x1c`| `^\ `| `FS`  |           |
+|`0x1d`| `^]` | `GS`  |           |
+|`0x1e`| `^^` | `RS`  | *`acsc`*  | (Used for graphics: up arrow)
+|`0x1f`| `^_` | `US`  | *`acsc`*  | (Used for graphics: down arrow)
+|`0x7f`| `^?` | `DEL` | *`cub1`*  | Move cursor back one position
 
 
 ## Issues
