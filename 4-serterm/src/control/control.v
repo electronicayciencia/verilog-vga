@@ -6,12 +6,14 @@ Valid/ready handshake.
 Control characters:
       NUL = 8'h00, // ^@ do nothing.
       BEL = 8'h07, // ^G generate bel signal
-      BS  = 8'h08, // ^H move cursor 1 position to the right
+      BS  = 8'h08, // ^H move cursor 1 position to the left
       HT  = 8'h09, // ^I Tab move cursor col to the next multiple of 8
-      DEL = 8'h7F, // ^? move cursor 1 position to the right
+      DEL = 8'h7F, // ^? move cursor 1 position to the left
       LF  = 8'h0A, // ^J move cursor 1 position down, scroll text if needed
       FF  = 8'h0C, // ^L clear the screen and home cursor
       CR  = 8'h0D, // ^M move the cursor to first position in the line
+      DC2 = 8'h12; // ^R move cursor 1 position up
+      DC3 = 8'h13; // ^S move cursor 1 position right
       DC4 = 8'h14; // ^T position the cursor at row / col
 
 else: 
@@ -83,12 +85,14 @@ This block interprets control characters.
 */
 localparam NUL = 8'h00, // ^@ do nothing.
            BEL = 8'h07, // ^G generate bel signal
-           BS  = 8'h08, // ^H move cursor 1 position to the right
+           BS  = 8'h08, // ^H move cursor 1 position to the left
            HT  = 8'h09, // ^I Tab move cursor col to the next multiple of 8
-           DEL = 8'h7F, // ^? move cursor 1 position to the right
+           DEL = 8'h7F, // ^? move cursor 1 position to the left
            LF  = 8'h0A, // ^J move cursor 1 position down, scroll text if needed
            FF  = 8'h0C, // ^L clear the screen and home cursor
            CR  = 8'h0D, // ^M move the cursor to first position in the line
+           DC2 = 8'h12, // ^R move cursor 1 position up
+           DC3 = 8'h13, // ^S move cursor 1 position right
            DC4 = 8'h14; // ^T position the cursor at row / col
 
 localparam IDLE       = 3'd0,  // done
@@ -178,6 +182,21 @@ always @(posedge i_clk) begin
                     end
                 end
 
+                {true, DC2}: begin
+                    if (status == NEW) begin
+                        if (row != first_row)
+                            row <= row - 1'b1;
+                        status <= IDLE;
+                    end
+                end
+
+                {true, DC3}: begin
+                    if (status == NEW) begin
+                        if (col != last_col)
+                            col <= col + 1'b1;
+                        status <= IDLE;
+                    end
+                end
 
                 {true, DC4}: begin
                     if (status == NEW) begin
