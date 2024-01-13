@@ -6,8 +6,8 @@ module video (
 
     // VRAM port for the controller
     input [10:0]    i_vram_addr,    // VRAM address {5'y, 6'x}
-    input  [7:0]    i_vram_din,     // VRAM data in
-    output [7:0]    o_vram_dout,    // VRAM data out
+    input  [8:0]    i_vram_din,     // VRAM data in  {reverse, char[7:0]}
+    output [8:0]    o_vram_dout,    // VRAM data out {reverse : char[7:0]}
     input           i_vram_clk,     // VRAM clock
     input           i_vram_ce,      // VRAM clock enable
     input           i_vram_wre,     // VRAM write/read
@@ -29,22 +29,22 @@ parameter true = 1'b1;
 /*  Character buffer
 /*************************************/
 wire [10:0] bvram_addr;
-wire  [7:0] bvram_dout;
+wire  [8:0] bvram_dout; // {reverse : char[7:0]}
 
 vram_m64x32 vram(
     // A port: for the controller
     .ada       (i_vram_addr),  //input [10:0] A address
-    .dina      (i_vram_din),   //input  [7:0] A data in
-    .douta     (o_vram_dout),  //output [7:0] A data out
+    .dina      (i_vram_din),   //input  [8:0] A data in
+    .douta     (o_vram_dout),  //output [8:0] A data out
     .wrea      (i_vram_wre),   //input A write/read
     .clka      (i_vram_clk),   //input clock for A port 
     .cea       (i_vram_ce),    //input clock enable for A
-    .reseta    (false),         //input reset for A
+    .reseta    (false),        //input reset for A
 
     // B port: for the text engine
-    .adb       (bvram_addr),    //input [10:0] B address
-    .dinb      (8'b0),          //input  [7:0] B data in
-    .doutb     (bvram_dout),    //output [7:0] B data out
+    .adb       (bvram_addr),   //input [10:0] B address
+    .dinb      (9'b0),         //input  [8:0] B data in
+    .doutb     (bvram_dout),   //output [8:0] B data out
     .wreb      (false),        //input B port is read-only
     .clkb      (i_clk),        //input clock for B port 
     .ceb       (true),         //input clock enable for B
@@ -65,8 +65,8 @@ text text(
     .i_clk          (i_clk),        // Clock (12 MHz)
 
     // VRAM handler
-    .i_char_data    (bvram_dout),   // get the character data (monochrome)
-    .o_video_addr   (bvram_addr),   // VRAM address
+    .i_char_data    (bvram_dout[7:0]), // get the character data (monochrome)
+    .o_video_addr   (bvram_addr),      // VRAM address
 
     // LCD signals
     .o_pxon         (chr_on),       // Monochrome pixel can be on/off
@@ -117,8 +117,21 @@ reg reversev = false;
 always @(negedge o_LCD_VSYNC)
     reversev <= i_reversev;
 
-// Cursor signal xor with current caracter, same with bel
-wire pxon = chr_on ^ cur_on_delayed ^ reversev; // pixel is ON/OFF
+/*************************************
+/*  Text attribute: reverse video
+/*************************************/
+/* Need 1 tick delay */
+wire attr_rev = bvram_dout[8];
+reg attr_rev_delayed = false;
+always @(negedge i_clk)
+    attr_rev_delayed <= attr_rev;
+
+
+/*************************************
+/*  Combine all reverse video sources
+/*************************************/
+// pixel is ON/OFF
+wire pxon = chr_on ^ cur_on_delayed ^ reversev ^ attr_rev_delayed;
 
 
 

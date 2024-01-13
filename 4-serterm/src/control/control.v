@@ -4,17 +4,7 @@ This is the abstraction layer to interact with the text hardware.
 Valid/ready handshake.
 
 Control characters:
-      NUL = 8'h00, // ^@ do nothing.
-      BEL = 8'h07, // ^G generate bel signal
-      BS  = 8'h08, // ^H move cursor 1 position to the left
-      HT  = 8'h09, // ^I Tab move cursor col to the next multiple of 8
-      DEL = 8'h7F, // ^? move cursor 1 position to the left
-      LF  = 8'h0A, // ^J move cursor 1 position down, scroll text if needed
-      FF  = 8'h0C, // ^L clear the screen and home cursor
-      CR  = 8'h0D, // ^M move the cursor to first position in the line
-      DC2 = 8'h12; // ^R move cursor 1 position up
-      DC3 = 8'h13; // ^S move cursor 1 position right
-      DC4 = 8'h14; // ^T position the cursor at row / col
+    (see README)
 
 else: 
 - put the char in the current position
@@ -34,8 +24,8 @@ module control (
 
     // VRAM handler
     output [10:0] o_vram_addr, // VRAM address {5'y, 6'x}
-    output  [7:0] o_vram_din,  // VRAM data in
-    input   [7:0] i_vram_dout, // VRAM data out
+    output  [8:0] o_vram_din,  // VRAM data in
+    input   [8:0] i_vram_dout, // VRAM data out
     output        o_vram_clk,  // VRAM clock
     output        o_vram_ce,   // VRAM clock enable
     output        o_vram_wre,  // VRAM write/read
@@ -67,6 +57,7 @@ assign o_ready = (status == IDLE) |
 // Values for vram lines when no other module is running
 reg vram_w  = false;
 reg vram_ce = false;
+reg attr_reverse = false;
 
 assign o_vram_clk  = i_clk;
 assign o_vram_wre  = common_vram_w;
@@ -91,9 +82,15 @@ localparam NUL = 8'h00, // ^@ do nothing.
            LF  = 8'h0A, // ^J move cursor 1 position down, scroll text if needed
            FF  = 8'h0C, // ^L clear the screen and home cursor
            CR  = 8'h0D, // ^M move the cursor to first position in the line
+        // DLE = 8'h10 (Used for graphics: right arrow)
+        // DC1 = 8'h11 (Used for graphics: left arrow)
            DC2 = 8'h12, // ^R move cursor 1 position up
            DC3 = 8'h13, // ^S move cursor 1 position right
-           DC4 = 8'h14; // ^T position the cursor at row / col
+           DC4 = 8'h14, // ^T position the cursor at row / col
+           SO  = 8'h0E, // ^N start reverse video mode
+           SI  = 8'h0F; // ^O end reverse video mode
+        // RS  = 8'h1e (Used for graphics: up arrow)
+        // US =  8'h1f (Used for graphics: down arrow)
 
 localparam IDLE       = 3'd0,  // done
            NEW        = 3'd1,  // new character
@@ -204,6 +201,19 @@ always @(posedge i_clk) begin
                     end
                 end
 
+                {true, SO}: begin
+                    if (status == NEW) begin
+                        attr_reverse <= true;
+                        status <= IDLE;
+                    end
+                end
+
+                {true, SI}: begin
+                    if (status == NEW) begin
+                        attr_reverse <= false;
+                        status <= IDLE;
+                    end
+                end
 
                 {true, LF}: begin
                     case (status)
@@ -300,7 +310,7 @@ end
 reg         common_vram_w;
 reg         common_vram_ce;
 reg  [10:0] common_vram_addr;
-reg   [7:0] common_vram_din;
+reg   [8:0] common_vram_din;
 
 wire        scroll_vram_w,
             clear_vram_w;
@@ -311,7 +321,7 @@ wire        scroll_vram_ce,
 wire [10:0] scroll_vram_addr, 
             clear_vram_addr;
 
-wire  [7:0] scroll_vram_din, 
+wire  [8:0] scroll_vram_din, 
             clear_vram_din;
 
 
@@ -336,7 +346,7 @@ always @(*) begin
             common_vram_w    <= vram_w;
             common_vram_ce   <= vram_ce;
             common_vram_addr <= {row, col};
-            common_vram_din  <= char;
+            common_vram_din  <= {attr_reverse, char};
         end
 
     endcase

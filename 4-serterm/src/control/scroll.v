@@ -7,8 +7,8 @@ module scroll (
     output [10:0] o_vram_addr,
     output        o_vram_w,
     output        o_vram_ce,
-    input   [7:0] i_vram_dout,
-    output  [7:0] o_vram_din
+    input   [8:0] i_vram_dout,
+    output  [8:0] o_vram_din
 );
 
 localparam [4:0] first_line = 0;

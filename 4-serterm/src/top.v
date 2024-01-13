@@ -115,8 +115,8 @@ uart_pc (
 /* Render the VRAM contents into video signals
 /**************************/
 wire [10:0] vram_addr; // VRAM address {5'y, 6'x}
-wire  [7:0] vram_din;  // VRAM data in
-wire  [7:0] vram_dout; // VRAM data out
+wire  [8:0] vram_din;  // VRAM data in
+wire  [8:0] vram_dout; // VRAM data out
 wire        vram_clk;  // VRAM clock
 wire        vram_ce;   // VRAM clock enable
 wire        vram_wre;  // VRAM write/read

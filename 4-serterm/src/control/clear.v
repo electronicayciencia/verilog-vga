@@ -7,12 +7,12 @@ module clear (
     output [10:0] o_vram_addr,
     output        o_vram_w,
     output        o_vram_ce,
-    output  [7:0] o_vram_din
+    output  [8:0] o_vram_din
 );
 
 parameter [10:0] first_addr = 11'b00000_000000;
 parameter [10:0] last_addr  = 11'b11111_111111;
-parameter  [7:0] filling = 8'b0;
+parameter  [8:0] filling = 9'b0;
 
 localparam false = 1'b0;
 localparam true = 1'b1;

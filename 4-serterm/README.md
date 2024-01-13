@@ -50,10 +50,11 @@ This is the terminal description file (`eyc.inf`):
       lines#17,
       cr=^M, bel=^G, ind=^J,
       clear=^L,
+      it#8,ht=^I,
       cub1=^H, cud1=^J, cuu1=^R, cuf1=^S,
       cup=^T%p1%' '%+%c%p2%' '%+%c,
       home=^T  ,
-      it#8,ht=^I,
+      rev=^N, sgr0=^O, sgr@,
       acsc=+\020\,\021-\036.\0370\333l\332m\300k\277j\331q\304x\263u\264t\303n\305v\301w\302O\333a\261o\337s\334,
 
 Compile it with the following command:
@@ -94,6 +95,8 @@ dtoverlay=miniuart-bt
 
 ### Break key
 
+**Break** is invoked using both SysReq key or the Pause/Break key.
+
 In order to use SAK as a Secure Access Key, add this to the boot sequence:
 
 ```
@@ -111,11 +114,13 @@ Cursor location is also supported:
 
 ![](https://www.electronicayciencia.com/assets/2024/01/consola-serie/img/screen_vi.jpg)
 
-And graphical characters, compatible with `dialog` applications:
+Graphical characters, compatible with `dialog` applications:
 
 ![](https://www.electronicayciencia.com/assets/2024/01/consola-serie/img/screen_dialog.jpg)
 
-**Break** is invoked using the SysReq key or the Pause/Break.
+Reverse video:
+
+![](https://www.electronicayciencia.com/assets/2024/01/consola-serie/img/screen_mc.jpg)
 
 
 ### Control character table
@@ -136,8 +141,8 @@ And graphical characters, compatible with `dialog` applications:
 |`0x0b`| `^K` | `VT`  |           |
 |`0x0c`| `^L` | `FF`  | *`clear`* | Clear the screen and home cursor
 |`0x0d`| `^M` | `CR`  | *`cr`*    | Move cursor to first column, same line
-|`0x0e`| `^N` | `SO`  |           |
-|`0x0f`| `^O` | `SI`  |           |
+|`0x0e`| `^N` | `SO`  | *`rev`*   | Start reverse video mode
+|`0x0f`| `^O` | `SI`  | *`sgr0`*  | End reverse video mode
 |`0x10`| `^P` | `DLE` | *`acsc`*  | (Used for graphics: right arrow)
 |`0x11`| `^Q` | `DC1` | *`acsc`*  | (Used for graphics: left arrow)
 |`0x12`| `^R` | `DC2` | *`cuu1`*  | Move cursor one position up
