@@ -46,16 +46,17 @@ This is the terminal description file (`eyc.inf`):
 
     eyc|Electronica y ciencia Text terminal,
       am,
-      cols#60,
-      lines#17,
+      cols#60, lines#17,
       cr=^M, bel=^G, ind=^J,
       clear=^L,
-      it#8,ht=^I,
+      it#8, ht=^I,
       cub1=^H, cud1=^J, cuu1=^R, cuf1=^S,
       cup=^T%p1%' '%+%c%p2%' '%+%c,
       home=^T  ,
       smso=^N, rmso=^O, msgr,
       rev=^N, sgr0=^O, sgr@,
+      smam=^B, rmam=^C,
+      is1=^B^O^L,
       acsc=+\020\,\021-\036.\0370\333l\332m\300k\277j\331q\304x\263u\264t\303n\305v\301w\302O\333a\261o\337s\334,
 
 Compile it with the following command:
@@ -130,10 +131,10 @@ Reverse video:
 |:----:|:----:|:-----:|:---------:|------------------------
 |`0x00`| `^@` | `NUL` |           | Do nothing (padding)
 |`0x01`| `^A` | `SOH` |           |
-|`0x02`| `^B` | `STX` |           |
-|`0x03`| `^C` | `ETX` |           |
+|`0x02`| `^B` | `STX` | *`smam`*  | Turn on automatic margins
+|`0x03`| `^C` | `ETX` | *`rmam`*  | Turn off automatic margins
 |`0x04`| `^D` | `EOT` |           |
-|`0x05`| `^E` | `ENQ` |           |
+|`0x05`| `^E` | `ENQ` |           | *Reserved for future use*
 |`0x06`| `^F` | `ACK` |           |
 |`0x07`| `^G` | `BEL` | *`bel`*   | Flash the screen (visual bell)
 |`0x08`| `^H` | `BS`  | *`cub1`*  | Move cursor one position to the left
@@ -144,8 +145,8 @@ Reverse video:
 |`0x0d`| `^M` | `CR`  | *`cr`*    | Move cursor to first column, same line
 |`0x0e`| `^N` | `SO`  | *`rev`*   | Start reverse video mode
 |`0x0f`| `^O` | `SI`  | *`sgr0`*  | End reverse video mode
-|`0x10`| `^P` | `DLE` | *`acsc`*  | (Used for graphics: right arrow)
-|`0x11`| `^Q` | `DC1` | *`acsc`*  | (Used for graphics: left arrow)
+|`0x10`| `^P` | `DLE` | *`acsc`*  | *Used for graphics: right arrow*
+|`0x11`| `^Q` | `DC1` | *`acsc`*  | *Used for graphics: left arrow*
 |`0x12`| `^R` | `DC2` | *`cuu1`*  | Move cursor one position up
 |`0x13`| `^S` | `DC3` | *`cuf1`*  | Move cursor one position to the right
 |`0x14`| `^T` | `DC4` | *`cup`*   | Move cursor to #1,#2. See terminfo file
@@ -155,11 +156,11 @@ Reverse video:
 |`0x18`| `^X` | `CAN` |           |
 |`0x19`| `^Y` | `EM`  |           |
 |`0x1a`| `^Z` | `SUB` |           |
-|`0x1b`| `^[` | `ESC` |           |
+|`0x1b`| `^[` | `ESC` |           | *Reserved for future use*
 |`0x1c`| `^\ `| `FS`  |           |
 |`0x1d`| `^]` | `GS`  |           |
-|`0x1e`| `^^` | `RS`  | *`acsc`*  | (Used for graphics: up arrow)
-|`0x1f`| `^_` | `US`  | *`acsc`*  | (Used for graphics: down arrow)
+|`0x1e`| `^^` | `RS`  | *`acsc`*  | *Used for graphics: up arrow*
+|`0x1f`| `^_` | `US`  | *`acsc`*  | *Used for graphics: down arrow*
 |`0x7f`| `^?` | `DEL` | *`cub1`*  | Move cursor back one position
 
 

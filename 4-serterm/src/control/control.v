@@ -58,6 +58,7 @@ assign o_ready = (status == IDLE) |
 reg vram_w  = false;
 reg vram_ce = false;
 reg attr_reverse = false;
+reg automargin = true;
 
 assign o_vram_clk  = i_clk;
 assign o_vram_wre  = common_vram_w;
@@ -75,6 +76,8 @@ Main controller.
 This block interprets control characters.
 */
 localparam NUL = 8'h00, // ^@ do nothing.
+           STX = 8'h02, // ^B Turn on automatic margins
+           ETX = 8'h03, // ^C Turn off automatic margins
            BEL = 8'h07, // ^G generate bel signal
            BS  = 8'h08, // ^H move cursor 1 position to the left
            HT  = 8'h09, // ^I Tab move cursor col to the next multiple of 8
@@ -139,6 +142,20 @@ always @(posedge i_clk) begin
             case ({i_ectlchrs, char})
                 {true, NUL}: begin
                     if (status == NEW) begin
+                        status <= IDLE;
+                    end
+                end
+
+                {true, STX}: begin
+                    if (status == NEW) begin
+                        automargin <= true;
+                        status <= IDLE;
+                    end
+                end
+
+                {true, ETX}: begin
+                    if (status == NEW) begin
+                        automargin <= false;
                         status <= IDLE;
                     end
                 end
@@ -270,13 +287,20 @@ always @(posedge i_clk) begin
                             vram_w <= false;
                             vram_ce <= false;
                             if (col == last_col) begin
-                                col <= first_col;
-                                row <= row == last_row ? row : row + 1'b1;
+                                if (automargin) begin
+                                    col <= first_col;
+                                    row <= row == last_row ? row : row + 1'b1;
+                                end
+                                else begin
+                                    col <= col;
+                                    row <= row;
+                                end
                             end
                             else begin
                                 col <= col + 1'b1;
                             end
-                            if (row == last_row & col == last_col) begin
+
+                            if (row == last_row & col == last_col & automargin) begin
                                 status <= SCROLLING;
                                 scroll_start <= true;
                             end
