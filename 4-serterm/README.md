@@ -56,7 +56,7 @@ This is the terminal description file (`eyc.inf`):
       smso=^N, rmso=^O, msgr,
       rev=^N, sgr0=^O, sgr@,
       smam=^B, rmam=^C,
-      is1=^B^O^L,
+      is2=^B^O^L,
       kcuu1=^P, kcub1=^B, kcud1=^N, kcuf1=^F,
       acsc=+\020\,\021-\036.\0370\333l\332m\300k\277j\331q\304x\263u\264t\303n\305v\301w\302O\333a\261o\337s\334,
 
