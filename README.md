@@ -53,5 +53,5 @@ Repository:
 
 Main post (spanish):
 
-- Mi propia consola serie (work in progress)
+- [Mi propia consola serie y el terminal de Unix](https://www.electronicayciencia.com/2024/01/consola-serie.html)
 
