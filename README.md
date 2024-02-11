@@ -1,18 +1,24 @@
 # Verilog VGA
 
-This is a beginner project to learn how to work with a FPGA and a LCD display.
+This is a project to learn how to work with a FPGA and a LCD display.
 
-The screen is 480x272 4.3".
+Increasing degree of difficulty:
+- Patterns
+- Images
+- Text
+- Serial terminal
+
+Each repository have a `readme` file listing key points and examples, as well as an extensive blog post with a detailed explanation (in spanish).
 
 ## Part I: Patterns
 
 Draw basic preconfigured patterns.
 
-Repository:
+Repository, doc and examples:
 
-- [1. Patterns](1-patterns)
+- [1. Patterns README](1-patterns/README.md)
 
-Main post (spanish):
+Extensive blog post with details (spanish):
 
 - [Pantalla LCD con Tang Nano I. Patrones](https://www.electronicayciencia.com/2021/11/lcd_tang_nano_I_patrones.html)
 
@@ -21,11 +27,11 @@ Main post (spanish):
 
 Draw images from ROM or RAM.
 
-Repository:
+Repository, doc and examples:
 
 - [2. Images](2-image)
 
-Main post (spanish):
+Extensive blog post with details (spanish):
 
 - [Gráficos VGA con FPGA Tang Nano parte II. Imágenes](https://www.electronicayciencia.com/2021/12/lcd_tang_nano_II_imagenes.html)
 
@@ -34,11 +40,11 @@ Main post (spanish):
 
 Draw text in 8x8 b/w or 8x16 b/w and color.
 
-Repository:
+Repository, doc and examples:
 
 - [3. Text](3-text)
 
-Main post (spanish):
+Extensive blog post with details (spanish):
 
 - [Gráficos VGA con FPGA Tang Nano parte III. Texto](https://www.electronicayciencia.com/2023/11/lcd_tang_nano_III_texto.html)
 
@@ -47,11 +53,11 @@ Main post (spanish):
 
 Using the text controller to make a serial terminal.
 
-Repository:
+Repository, doc and examples:
 
 - [4. Serial Terminal](4-serterm)
 
-Main post (spanish):
+Extensive blog post with details (spanish):
 
 - [Mi propia consola serie y el terminal de Unix](https://www.electronicayciencia.com/2024/01/consola-serie.html)
 
