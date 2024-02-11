@@ -10,6 +10,9 @@ Increasing degree of difficulty:
 
 Each repository have a `readme` file listing key points and examples, as well as an extensive blog post with a detailed explanation (in spanish).
 
+[Source repository](https://github.com/electronicayciencia/verilog-vga)
+
+
 ## Part I: Patterns
 
 Draw basic preconfigured patterns.
