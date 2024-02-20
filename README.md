@@ -1,4 +1,4 @@
-# Verilog VGA
+# VGA with Tang Nano
 
 This is a project to learn how to work with a FPGA and a LCD display.
 
