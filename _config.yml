@@ -1,1 +1,3 @@
-theme: minima
+theme: jekyll-theme-cayman
+title: VGA with Tang Nano
+description: Learn how to control a LCD with a FPGA doing, basic patterns, images, text and, finally, a serial terminal.
